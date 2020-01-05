@@ -8,6 +8,7 @@ import com.mh.controltool2.annotation.RestController;
 import com.mh.controltool2.exceptions.scan.ParameterNameNotStringException;
 import com.mh.controltool2.method.MethodInvokeInfo;
 import com.mh.controltool2.method.URLInvokeTree;
+import com.mh.controltool2.method.type.InvokeObjectInfo;
 import com.mh.controltool2.scan.*;
 import com.mh.controltool2.scan.fuzzymatch.FuzzyURLMatchToInfo;
 import com.mh.controltool2.scan.fuzzymatch.MatchURLInfo;
@@ -242,8 +243,12 @@ public class HandlerControl implements PackageProcessHandler {
         methodInvokeInfo.setClassname(aClass.getName());
         methodInvokeInfo.setMethodName(method.getName());
 
+//        methodInvokeInfo.setInvokeObjectInfoGroup();
 
-
+        // 检查函数注解以及类型完善InvokeObjectInfo,优先检查注解参数如无注解，则交由自动匹配处理器处理
+//        for(method.getParameterAnnotations()) {
+//
+//        }
 
         if (urlInvokeTree == null) {
 
