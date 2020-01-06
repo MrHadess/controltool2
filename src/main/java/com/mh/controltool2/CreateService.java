@@ -44,7 +44,9 @@ public class CreateService {
 
         centerPackageProcessHandler.startProcessHandler();
 
-
+        ApplicationContext applicationContext = new ApplicationContext();
+        applicationContext.setHandlerConfig(handlerConfig);
+        applicationContext.setHandlerControl(handlerControl);
 
 
 
