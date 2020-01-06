@@ -8,6 +8,7 @@ public enum TypeEnum {
 //    program method
     RequestBody,
     RequestParam,
+    RequestHeader,
     PathVariable
 
 }

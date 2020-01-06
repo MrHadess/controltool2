@@ -2,46 +2,55 @@ package com.mh.controltool2.scan.annotation;
 
 import com.mh.controltool2.LogOut;
 import com.mh.controltool2.annotation.Configuration;
+import com.mh.controltool2.config.annotation.Configurer;
 import com.mh.controltool2.scan.PackageProcessHandler;
 import com.mh.controltool2.servlet.HandlerInterceptor;
 
+import java.lang.reflect.Proxy;
 import java.util.List;
+import java.util.Objects;
 
 public class HandlerConfig implements PackageProcessHandler {
+
+    private static final String TAG = "HandlerConfig";
+
     @Override
     public void loadFullPackageData(List<Class<?>> classList) {
 
         for (Class<?> item:classList) {
+            if (!item.isAnnotationPresent(Configuration.class)) {
+                continue;
+            }
+
             Configuration annotationConfiguration = item.getAnnotation(Configuration.class);
             if (annotationConfiguration == null) continue;
 
             // Create config Configurer
-            if (!item.isAssignableFrom(HandlerInterceptor.class)) {
+            if (!item.isAssignableFrom(Configurer.class)) {
                 LogOut.e("Unmatch");
                 continue;
             }
 
-//            ControlAnnotation.RestController restControllerModulClass = item.getAnnotation(ControlAnnotation.RestController.class);
-//            //当此类不存在控制器时 不加入URL匹配Map中
-//            if (restControllerModulClass == null) continue;
-//            LogOut.i("-----------------------------------------------------------");
-//            LogOut.i("This has RestController:::" + item);
-//
-//            String className = item.getName();
-//
-//            //控制器根Mapping前缀匹配
-//            String urlFirstMatch = "";
-//            ControlAnnotation.RequestMapping requestMappingClass = item.getAnnotation(ControlAnnotation.RequestMapping.class);
-//            if (requestMappingClass != null) {
-//                String value = requestMappingClass.value().trim();
-//                LogOut.i("This has RequestMapping:::" + item + "  value=" + requestMappingClass.value());
-//                if (!value.isEmpty()) {
-//                    urlFirstMatch = value;
-//                }
-//            }
-//
-//            //Method check
-//            methodCheck(item,urlFirstMatch,className);
+            if (item.getConstructors().length > 0) {
+                LogOut.e(TAG,"Unknown empty constructors ==>" + item.getName());
+            }
+
+            try {
+                Configurer configurer = (Configurer) item.newInstance();
+
+
+
+
+
+
+
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+            return;
         }
 
 

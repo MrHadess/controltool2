@@ -2,17 +2,17 @@ package com.mh.controltool2.method.type;
 
 
 /*
-* get request param value
+* get request header value
 * need:
 * param for key
 * */
-public class InvokeRequestParam extends InvokeObjectInfo {
+public class InvokeRequestHeader extends InvokeObjectInfo {
 
     private String paramKey;
 
     @Override
     public TypeEnum getHandlerType() {
-        return TypeEnum.RequestParam;
+        return TypeEnum.RequestHeader;
     }
 
     public String getParamKey() {
