@@ -24,10 +24,8 @@ public class ApplicationContext {
     * default load file 'control_tool.properties'
     *
     * */
-    @Deprecated
-    private ApplicationContext() {
-
-    }
+//    @Deprecated
+//    private ApplicationContext() { }
 
     private ApplicationContext(ServletConfig servletConfig) {
         String needScanPackages = servletConfig.getInitParameter("ScanPkg");
@@ -52,7 +50,7 @@ public class ApplicationContext {
 
     }
 
-    public static ApplicationContext create(ServletConfig servletConfig) {
+    protected static ApplicationContext create(ServletConfig servletConfig) {
         return new ApplicationContext(servletConfig);
     }
 
@@ -63,7 +61,5 @@ public class ApplicationContext {
     public HandlerConfig getHandlerConfig() {
         return handlerConfig;
     }
-
-    //    CreateService
 
 }
