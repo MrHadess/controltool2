@@ -1,6 +1,7 @@
 package com.mh.controltool2.handler;
 
 import com.google.gson.Gson;
+import com.mh.controltool2.ApplicationContext;
 import com.mh.controltool2.context.FullApplicationContext;
 import com.mh.controltool2.exceptions.invoke.ParamDataIsEmptyException;
 import com.mh.controltool2.exceptions.invoke.UnsupportedSerializeObjectException;
@@ -22,12 +23,18 @@ import java.util.regex.Pattern;
 
 public class RequestMappingHandler {
 
+    private ApplicationContext applicationContext;
     private HashMap<String,URLInvokeTree> urlAbsolutelyMap;
     private HashMap<Pattern,URLInvokeTree> urlFuzzyMap;
 
     private Gson json = new Gson();
 
-    public RequestMappingHandler(HashMap<String, URLInvokeTree> urlAbsolutelyMap, HashMap<Pattern, URLInvokeTree> urlFuzzyMap) {
+    public RequestMappingHandler(
+            ApplicationContext applicationContext,
+            HashMap<String, URLInvokeTree> urlAbsolutelyMap,
+            HashMap<Pattern, URLInvokeTree> urlFuzzyMap
+    ) {
+        this.applicationContext = applicationContext;
         this.urlAbsolutelyMap = urlAbsolutelyMap;
         this.urlFuzzyMap = urlFuzzyMap;
     }
@@ -97,13 +104,10 @@ public class RequestMappingHandler {
         }
 
 
-        methodInvokeInfo.getMethodName().invoke(
-                new FullApplicationContext().getBean(methodInvokeInfo.getClassname()),
+        return methodInvokeInfo.getMethodName().invoke(
+                applicationContext.getBean(methodInvokeInfo.getClassname()),
                 methodParamObject
         );
-
-
-        return null;
     }
 
     private Object paramDataToRequestHeader(InvokeRequestHeader invokeRequestHeader,HttpServletRequest request) throws UnsupportedSerializeObjectException,ParamDataIsEmptyException,NumberFormatException {

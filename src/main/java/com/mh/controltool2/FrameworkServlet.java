@@ -1,5 +1,6 @@
 package com.mh.controltool2;
 
+import com.mh.controltool2.context.FullApplicationContext;
 import com.mh.controltool2.handler.DispatcherServlet;
 
 import javax.servlet.*;
@@ -11,11 +12,12 @@ import java.io.IOException;
 public class FrameworkServlet extends HttpServlet {
 
     private Config config;
+    private ApplicationContext applicationContext = new FullApplicationContext();
     private DispatcherServlet dispatcherServlet = new DispatcherServlet();
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+        dispatcherServlet.handlerRequest(req,resp);
     }
 
     @Override
@@ -25,7 +27,7 @@ public class FrameworkServlet extends HttpServlet {
         LogOut.i("FrameworkServlet initiation");
 
         config = Config.create(servletConfig);
-        dispatcherServlet.init(config);
+        dispatcherServlet.init(config,applicationContext);
 
     }
 

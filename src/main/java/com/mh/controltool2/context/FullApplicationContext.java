@@ -10,17 +10,28 @@ import java.util.HashMap;
 * */
 public class FullApplicationContext implements ApplicationContext {
 
+    private static final String PACKAGE_NAME_LANG = "java.lang";
+
     private HashMap<String,Object> objectMap = new HashMap<>();
 
     @Override
-    public <T> T tryGetBean(Class<T> tClass) {
+    public <T> T tryGetBean(Class<T> tClass) throws InstantiationException, IllegalAccessException {
         Object obj = objectMap.get(tClass.getName());
         if (obj != null) {
             return tClass.cast(obj);
         }
         // try create obj
+        return createObj(tClass,tClass);
+    }
 
-        return null;
+    @Override
+    public <T> T tryGetBean(Class<T> tClass, Class<? extends T> tClassImpl) throws InstantiationException, IllegalAccessException {
+        Object obj = objectMap.get(tClass.getName());
+        if (obj != null) {
+            return tClass.cast(obj);
+        }
+        // try create obj
+        return createObj(tClass,tClassImpl);
     }
 
     @Override
@@ -39,37 +50,33 @@ public class FullApplicationContext implements ApplicationContext {
 
     @Override
     public void addBean(Class<?> tClass, Object obj) {
-
+        objectMap.put(tClass.getName(),obj);
     }
 
     @Override
     public void addBean(String name, Object obj) {
-
+        objectMap.put(name,obj);
     }
 
     @Override
     public void addBean(Object obj) {
-
+        String beanName= obj.getClass().getName();
+        if (PACKAGE_NAME_LANG.startsWith(beanName)) {
+            return;
+        }
+        objectMap.put(beanName,obj);
     }
 
-    private Object createObj(Class<?> tClass)  {
-
+    private synchronized <T> T createObj(Class<T> tClass, Class<? extends T> tClassImpl) throws IllegalAccessException, InstantiationException {
         // just support public constructors
-        Constructor[] constructors = tClass.getConstructors();
+        Constructor[] constructors = tClassImpl.getConstructors();
         for (Constructor item:constructors) {
             if (item.getParameterCount() <= 0) {
-
-            } else {
-
+                T obj = tClassImpl.newInstance();
+                objectMap.put(tClass.getName(),obj);
+                return obj;
             }
         }
-
-
-
-
-
-
-
-        return null;
+        throw new InstantiationException(tClass.getName());
     }
 }
