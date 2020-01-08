@@ -2,27 +2,28 @@ package com.mh.controltool2.method;
 
 import com.mh.controltool2.method.type.InvokeObjectInfo;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 
 public class MethodInvokeInfo {
 
-    private String classname;
-    private String methodName;
+    private Class<?> classname;
+    private Method methodName;
     private InvokeObjectInfo[] invokeObjectInfoGroup;
 
-    public String getClassname() {
+    public Class<?> getClassname() {
         return classname;
     }
 
-    public void setClassname(String classname) {
+    public void setClassname(Class<?> classname) {
         this.classname = classname;
     }
 
-    public String getMethodName() {
+    public Method getMethodName() {
         return methodName;
     }
 
-    public void setMethodName(String methodName) {
+    public void setMethodName(Method methodName) {
         this.methodName = methodName;
     }
 

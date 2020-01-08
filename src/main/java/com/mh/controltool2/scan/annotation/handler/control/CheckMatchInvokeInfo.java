@@ -3,7 +3,10 @@ package com.mh.controltool2.scan.annotation.handler.control;
 import com.mh.controltool2.exceptions.scan.MultipleAnnotationException;
 import com.mh.controltool2.method.type.InvokeDefaultValue;
 import com.mh.controltool2.method.type.InvokeObjectInfo;
+import com.mh.controltool2.method.type.InvokeUnmatchedObject;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -58,9 +61,22 @@ public class CheckMatchInvokeInfo {
     }
 
     private InvokeObjectInfo unknownAnnotationMatch(Parameter parameter) {
-        InvokeDefaultValue invokeDefaultValue = new InvokeDefaultValue();
-        invokeDefaultValue.setArgToClass(parameter.getType());
-        return invokeDefaultValue;
+        if (supportDefaultParam(parameter.getType())) {
+            InvokeDefaultValue invokeDefaultValue = new InvokeDefaultValue();
+            invokeDefaultValue.setArgToClass(parameter.getType());
+            return invokeDefaultValue;
+        }
+
+        InvokeUnmatchedObject invokeUnmatchedObject = new InvokeUnmatchedObject();
+        invokeUnmatchedObject.setArgToClass(parameter.getType());
+        return invokeUnmatchedObject;
+    }
+
+    private boolean supportDefaultParam(Class<?> tClass) {
+        if (tClass.isAssignableFrom(HttpServletRequest.class)) return true;
+        if (tClass.isAssignableFrom(HttpServletResponse.class)) return true;
+
+        return false;
     }
 
 }

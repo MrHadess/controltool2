@@ -1,5 +1,7 @@
 package com.mh.controltool2;
 
+import com.mh.controltool2.handler.DispatcherServlet;
+
 import javax.servlet.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -8,7 +10,8 @@ import java.io.IOException;
 
 public class FrameworkServlet extends HttpServlet {
 
-    private ApplicationContext applicationContext;
+    private Config config;
+    private DispatcherServlet dispatcherServlet = new DispatcherServlet();
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -21,9 +24,8 @@ public class FrameworkServlet extends HttpServlet {
 //        System.out.println(logo);
         LogOut.i("FrameworkServlet initiation");
 
-        applicationContext = ApplicationContext.create(servletConfig);
-
-
+        config = Config.create(servletConfig);
+        dispatcherServlet.init(config);
 
     }
 
@@ -32,13 +34,13 @@ public class FrameworkServlet extends HttpServlet {
 
     }
 
-    private static final String logo =
-                            "   _____            _             _ _______          _ \n" +
-                            "  / ____|          | |           | |__   __|        | |\n" +
-                            " | |     ___  _ __ | |_ _ __ ___ | |  | | ___   ___ | |\n" +
-                            " | |    / _ \\| '_ \\| __| '__/ _ \\| |  | |/ _ \\ / _ \\| |\n" +
-                            " | |___| (_) | | | | |_| | | (_) | |  | | (_) | (_) | |\n" +
-                            "  \\_____\\___/|_| |_|\\__|_|  \\___/|_|  |_|\\___/ \\___/|_|\n" +
-                            "                                                       \n" +
-                            "                                                       ";
+//    private static final String logo =
+//                            "   _____            _             _ _______          _ \n" +
+//                            "  / ____|          | |           | |__   __|        | |\n" +
+//                            " | |     ___  _ __ | |_ _ __ ___ | |  | | ___   ___ | |\n" +
+//                            " | |    / _ \\| '_ \\| __| '__/ _ \\| |  | |/ _ \\ / _ \\| |\n" +
+//                            " | |___| (_) | | | | |_| | | (_) | |  | | (_) | (_) | |\n" +
+//                            "  \\_____\\___/|_| |_|\\__|_|  \\___/|_|  |_|\\___/ \\___/|_|\n" +
+//                            "                                                       \n" +
+//                            "                                                       ";
 }

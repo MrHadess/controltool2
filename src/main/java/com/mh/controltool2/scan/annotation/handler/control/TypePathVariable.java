@@ -3,7 +3,7 @@ package com.mh.controltool2.scan.annotation.handler.control;
 import com.mh.controltool2.annotation.PathVariable;
 import com.mh.controltool2.method.type.InvokeObjectInfo;
 import com.mh.controltool2.method.type.InvokePathVariable;
-import com.mh.controltool2.method.type.InvokeUnmatchObject;
+import com.mh.controltool2.method.type.InvokeUnmatchedObject;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -42,6 +42,6 @@ public class TypePathVariable implements AnnotationTypeHandler {
             matchLocalIndex++;
         }
 
-        return new InvokeUnmatchObject();
+        return new InvokeUnmatchedObject();
     }
 }

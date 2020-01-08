@@ -1,65 +1,28 @@
 package com.mh.controltool2;
 
-import com.mh.controltool2.scan.CenterPackageProcessHandler;
-import com.mh.controltool2.scan.PackageScan;
-import com.mh.controltool2.scan.annotation.HandlerConfig;
-import com.mh.controltool2.scan.annotation.HandlerControl;
+import java.util.HashMap;
 
-import javax.servlet.ServletConfig;
-import java.util.ArrayList;
-import java.util.List;
-
-public class ApplicationContext {
-
-    private CenterPackageProcessHandler centerPackageProcessHandler;
-
-    private HandlerControl handlerControl = new HandlerControl();
-    private HandlerConfig handlerConfig = new HandlerConfig();
-
+/*
+* Global value
+* */
+public interface ApplicationContext {
 
     /*
-    * first support annotation
-    * first not support file config
-    *
-    * default load file 'control_tool.properties'
+    * If get bean is uncreated object will be try create this object
     *
     * */
-//    @Deprecated
-//    private ApplicationContext() { }
+    <T> T tryGetBean(Class<T> tClass);
 
-    private ApplicationContext(ServletConfig servletConfig) {
-        String needScanPackages = servletConfig.getInitParameter("ScanPkg");
-        String[] packages = needScanPackages.split(";");
-        List<String> scanPackages = new ArrayList<String>();
-        for (String aPkg:packages) {
-            if (aPkg.isEmpty()) continue;
-            scanPackages.add(aPkg);
-        }
+    <T> T getBean(Class<T> tClass);
 
-        centerPackageProcessHandler = new CenterPackageProcessHandler(scanPackages);
-        centerPackageProcessHandler.addPackagesScan(handlerControl);
-        centerPackageProcessHandler.addPackagesScan(handlerConfig);
+    Object getBean(String name);
 
-        centerPackageProcessHandler.startProcessHandler();
+    void addBean(Class<?> tClass,Object obj);
+
+    void addBean(String name,Object obj);
+
+    void addBean(Object obj);
 
 
-
-
-
-
-
-    }
-
-    protected static ApplicationContext create(ServletConfig servletConfig) {
-        return new ApplicationContext(servletConfig);
-    }
-
-    public HandlerControl getHandlerControl() {
-        return handlerControl;
-    }
-
-    public HandlerConfig getHandlerConfig() {
-        return handlerConfig;
-    }
 
 }

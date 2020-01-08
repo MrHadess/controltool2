@@ -20,10 +20,10 @@ public class URLInvokeTree implements MatchInvokeObject {
         if (requestMethodInvokeInfoMap.containsKey(requestMethod)) {
             MethodInvokeInfo oldMethodInvokeInfo = requestMethodInvokeInfoMap.get(requestMethod);
             throw new RepeatURLMethodException(
-                    oldMethodInvokeInfo.getClassname(),
-                    oldMethodInvokeInfo.getMethodName(),
-                    methodInvokeInfo.getClassname(),
-                    methodInvokeInfo.getMethodName()
+                    oldMethodInvokeInfo.getClassname().getName(),
+                    oldMethodInvokeInfo.getMethodName().getName(),
+                    methodInvokeInfo.getClassname().getName(),
+                    methodInvokeInfo.getMethodName().getName()
             );
         }
 
