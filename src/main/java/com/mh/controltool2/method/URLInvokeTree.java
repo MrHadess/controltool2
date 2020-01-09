@@ -58,7 +58,11 @@ public class URLInvokeTree implements MatchInvokeObject {
                             clientReqMethod = RequestMethod.TRACE;
                             break;
                     }
-                    return requestMethodInvokeInfoMap.get(clientReqMethod);
+                    MethodInvokeInfo matchMethodInvokeInfo = requestMethodInvokeInfoMap.get(clientReqMethod);
+                    if (matchMethodInvokeInfo != null) {
+                        return matchMethodInvokeInfo;
+                    }
+                    return requestMethodInvokeInfoMap.get(RequestMethod.Full);
                 }
             };
         } else if (matchInvokeObject != multipleInvokeObject) {

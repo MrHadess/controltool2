@@ -3,7 +3,10 @@ package com.mh.controltool2.handler;
 
 import com.mh.controltool2.ApplicationContext;
 import com.mh.controltool2.Config;
+import com.mh.controltool2.exceptions.invoke.BeanInstantiationException;
+import com.mh.controltool2.exceptions.invoke.RequestMappingHandlerErrorException;
 import com.mh.controltool2.handler.pojo.RequestMatchInfo;
+import com.mh.controltool2.serialize.json.DataObjectSerialize;
 import com.mh.controltool2.serialize.json.DefaultDataObjectSerialize;
 import com.mh.controltool2.serialize.json.LoadJsonToClass;
 
@@ -11,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 
 
 /*
@@ -22,14 +26,14 @@ import java.io.PrintWriter;
 public class DispatcherServlet {
 
     private ApplicationContext applicationContext;
-
-    private static final LoadJsonToClass LOAD_JSON_TO_CLASS = new LoadJsonToClass();
+    private DataObjectSerialize dataObjectSerialize;
 
     private RequestMappingHandler requestMappingHandler;
 
     // init assembly
-    public void init(Config config, ApplicationContext applicationContext) {
+    public void init(Config config, ApplicationContext applicationContext) throws BeanInstantiationException {
         this.applicationContext = applicationContext;
+        dataObjectSerialize = applicationContext.tryGetBean(DefaultDataObjectSerialize.class);
         // bean group (Unrealized)
         // request mapping
         requestMappingHandler = new RequestMappingHandler(
@@ -41,7 +45,18 @@ public class DispatcherServlet {
     }
 
     public void handlerRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
         RequestContextHolder.update(request,response);
+
+        try {
+            startHandlerLine(request,response);
+        } finally {
+            RequestContextHolder.remove();
+        }
+
+    }
+
+    private void startHandlerLine(HttpServletRequest request, HttpServletResponse response) throws IOException {
         RequestMatchInfo requestMatchInfo = requestMappingHandler.requestMatchMethodInvokeInfo();
 
         if (requestMatchInfo == null || requestMatchInfo.getMethodInvokeInfo() == null) {
@@ -53,22 +68,23 @@ public class DispatcherServlet {
         Object reqReturnObject = null;
         try {
             reqReturnObject = requestMappingHandler.request(requestMatchInfo);
-        } catch (Exception e) {
+        } catch (IOException e) {
+            throw e;
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
             rewriteToClient(response, e.getMessage());
             return;
+        } catch (RequestMappingHandlerErrorException e) {
+            // use to 'handler interceptor'
+            e.getCause().printStackTrace();
+            rewriteToClient(response, e.getCause().getMessage());
+            return;
         }
 
-//        rewriteToClient(response, LOAD_JSON_TO_CLASS.toJson(reqReturnObject));
-        try {
-            rewriteToClient(response, applicationContext.tryGetBean(DefaultDataObjectSerialize.class).toJson(reqReturnObject));
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
 
-        RequestContextHolder.remove();
+        if (reqReturnObject != null) {
+            rewriteToClient(response, dataObjectSerialize.toJson(reqReturnObject));
+        }
     }
 
     private void rewriteToClient(HttpServletResponse response,String data) throws IOException {

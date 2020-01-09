@@ -1,15 +1,16 @@
 package com.mh.controltool2.handler;
 
-import com.google.gson.Gson;
 import com.mh.controltool2.ApplicationContext;
-import com.mh.controltool2.context.FullApplicationContext;
+import com.mh.controltool2.exceptions.invoke.BeanInstantiationException;
 import com.mh.controltool2.exceptions.invoke.ParamDataIsEmptyException;
+import com.mh.controltool2.exceptions.invoke.RequestMappingHandlerErrorException;
 import com.mh.controltool2.exceptions.invoke.UnsupportedSerializeObjectException;
 import com.mh.controltool2.handler.pojo.RequestMatchInfo;
 import com.mh.controltool2.method.MethodInvokeInfo;
 import com.mh.controltool2.method.URLInvokeTree;
 import com.mh.controltool2.method.type.*;
 import com.mh.controltool2.serialize.BaseDataTypeChange;
+import com.mh.controltool2.serialize.json.DataObjectSerialize;
 import com.mh.controltool2.serialize.json.DefaultDataObjectSerialize;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -28,16 +31,18 @@ public class RequestMappingHandler {
     private HashMap<String,URLInvokeTree> urlAbsolutelyMap;
     private HashMap<Pattern,URLInvokeTree> urlFuzzyMap;
 
-    private Gson json = new Gson();
+    private DataObjectSerialize dataObjectSerialize;
 
     public RequestMappingHandler(
             ApplicationContext applicationContext,
             HashMap<String, URLInvokeTree> urlAbsolutelyMap,
             HashMap<Pattern, URLInvokeTree> urlFuzzyMap
-    ) {
+    ) throws BeanInstantiationException {
         this.applicationContext = applicationContext;
         this.urlAbsolutelyMap = urlAbsolutelyMap;
         this.urlFuzzyMap = urlFuzzyMap;
+
+        dataObjectSerialize = applicationContext.tryGetBean(DefaultDataObjectSerialize.class);
     }
 
     protected RequestMatchInfo requestMatchMethodInvokeInfo() {
@@ -68,7 +73,7 @@ public class RequestMappingHandler {
         return null;
     }
 
-    protected Object request(RequestMatchInfo requestMatchInfo) throws Exception {
+    protected Object request(RequestMatchInfo requestMatchInfo) throws IOException, InvocationTargetException, IllegalAccessException,RequestMappingHandlerErrorException  {
 
         HttpServletRequest request = RequestContextHolder.getHttpServletRequest();
 
@@ -105,10 +110,17 @@ public class RequestMappingHandler {
         }
 
 
-        return methodInvokeInfo.getMethodName().invoke(
-                applicationContext.tryGetBean(methodInvokeInfo.getClassname()),
-                methodParamObject
-        );
+        try {
+            return methodInvokeInfo.getMethodName().invoke(
+                    applicationContext.tryGetBean(methodInvokeInfo.getClassname()),
+                    methodParamObject
+            );
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RequestMappingHandlerErrorException(e);
+        }
+
     }
 
     private Object paramDataToRequestHeader(InvokeRequestHeader invokeRequestHeader,HttpServletRequest request) throws UnsupportedSerializeObjectException,ParamDataIsEmptyException,NumberFormatException {
@@ -124,7 +136,7 @@ public class RequestMappingHandler {
     private Object paramDataToRequestBody(InvokeRequestBody invokeRequestBody, HttpServletRequest request) throws IOException {
         StringBuilder sb = new StringBuilder();
 
-        InputStreamReader inputStreamReader = new InputStreamReader(request.getInputStream(),"UTF-8");
+        InputStreamReader inputStreamReader = new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8);
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
         String temporaryLineContent;
@@ -134,14 +146,7 @@ public class RequestMappingHandler {
 
 //        return json.fromJson(sb.toString(),invokeRequestBody.getParameterizedType());
 
-        try {
-            return applicationContext.tryGetBean(DefaultDataObjectSerialize.class).toObject(sb.toString(),invokeRequestBody.getParameterizedType());
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return dataObjectSerialize.toObject(sb.toString(),invokeRequestBody.getParameterizedType());
     }
 
     private Object paramDataToPathVariable(InvokePathVariable invokePathVariable, RequestMatchInfo requestMatchInfo) throws UnsupportedSerializeObjectException,ParamDataIsEmptyException,NumberFormatException {

@@ -1,6 +1,7 @@
 package com.mh.controltool2.context;
 
 import com.mh.controltool2.ApplicationContext;
+import com.mh.controltool2.exceptions.invoke.BeanInstantiationException;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ public class FullApplicationContext implements ApplicationContext {
     private HashMap<String,Object> objectMap = new HashMap<>();
 
     @Override
-    public <T> T tryGetBean(Class<T> tClass) throws InstantiationException, IllegalAccessException {
+    public <T> T tryGetBean(Class<T> tClass) throws BeanInstantiationException {
         Object obj = objectMap.get(tClass.getName());
         if (obj != null) {
             return tClass.cast(obj);
@@ -25,7 +26,7 @@ public class FullApplicationContext implements ApplicationContext {
     }
 
     @Override
-    public <T> T tryGetBean(Class<T> tClass, Class<? extends T> tClassImpl) throws InstantiationException, IllegalAccessException {
+    public <T> T tryGetBean(Class<T> tClass, Class<? extends T> tClassImpl) throws BeanInstantiationException {
         Object obj = objectMap.get(tClass.getName());
         if (obj != null) {
             return tClass.cast(obj);
@@ -67,16 +68,20 @@ public class FullApplicationContext implements ApplicationContext {
         objectMap.put(beanName,obj);
     }
 
-    private synchronized <T> T createObj(Class<T> tClass, Class<? extends T> tClassImpl) throws IllegalAccessException, InstantiationException {
+    private synchronized <T> T createObj(Class<T> tClass, Class<? extends T> tClassImpl) throws BeanInstantiationException {
         // just support public constructors
         Constructor[] constructors = tClassImpl.getConstructors();
         for (Constructor item:constructors) {
             if (item.getParameterCount() <= 0) {
-                T obj = tClassImpl.newInstance();
-                objectMap.put(tClass.getName(),obj);
-                return obj;
+                try {
+                    T obj = tClassImpl.newInstance();
+                    objectMap.put(tClass.getName(),obj);
+                    return obj;
+                } catch (InstantiationException | IllegalAccessException e) {
+                    throw new BeanInstantiationException(e);
+                }
             }
         }
-        throw new InstantiationException(tClass.getName());
+        throw new BeanInstantiationException(tClass.getName());
     }
 }

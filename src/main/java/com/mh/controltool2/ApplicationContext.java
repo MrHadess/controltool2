@@ -1,6 +1,6 @@
 package com.mh.controltool2;
 
-import java.util.HashMap;
+import com.mh.controltool2.exceptions.invoke.BeanInstantiationException;
 
 /*
 * Global value
@@ -11,9 +11,9 @@ public interface ApplicationContext {
     * If get bean is uncreated object will be try create this object
     *
     * */
-    <T> T tryGetBean(Class<T> tClass) throws InstantiationException, IllegalAccessException;
+    <T> T tryGetBean(Class<T> tClass) throws BeanInstantiationException;
 
-    <T> T tryGetBean(Class<T> tClass,Class<? extends T> tClassImpl) throws InstantiationException, IllegalAccessException;
+    <T> T tryGetBean(Class<T> tClass,Class<? extends T> tClassImpl) throws BeanInstantiationException;
 
     <T> T getBean(Class<T> tClass);
 
