@@ -34,7 +34,31 @@ public class URLInvokeTree implements MatchInvokeObject {
             matchInvokeObject = new MatchInvokeObject() {
                 @Override
                 public MethodInvokeInfo getMatchInvokeObject(String trueRequestMethod) {
-                    return requestMethodInvokeInfoMap.get(requestMethod);
+                    RequestMethod clientReqMethod = null;
+                    switch (trueRequestMethod) {
+                        case "GET":
+                            clientReqMethod = RequestMethod.GET;
+                            break;
+                        case "HEAD":
+                            clientReqMethod = RequestMethod.HEAD;
+                            break;
+                        case "POST":
+                            clientReqMethod = RequestMethod.POST;
+                            break;
+                        case "PUT":
+                            clientReqMethod = RequestMethod.PUT;
+                            break;
+                        case "DELETE":
+                            clientReqMethod = RequestMethod.DELETE;
+                            break;
+                        case "OPTIONS":
+                            clientReqMethod = RequestMethod.OPTIONS;
+                            break;
+                        case "TRACE":
+                            clientReqMethod = RequestMethod.TRACE;
+                            break;
+                    }
+                    return requestMethodInvokeInfoMap.get(clientReqMethod);
                 }
             };
         } else if (matchInvokeObject != multipleInvokeObject) {

@@ -4,6 +4,7 @@ package com.mh.controltool2.handler;
 import com.mh.controltool2.ApplicationContext;
 import com.mh.controltool2.Config;
 import com.mh.controltool2.handler.pojo.RequestMatchInfo;
+import com.mh.controltool2.serialize.json.DefaultDataObjectSerialize;
 import com.mh.controltool2.serialize.json.LoadJsonToClass;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +44,7 @@ public class DispatcherServlet {
         RequestContextHolder.update(request,response);
         RequestMatchInfo requestMatchInfo = requestMappingHandler.requestMatchMethodInvokeInfo();
 
-        if (requestMatchInfo == null) {
+        if (requestMatchInfo == null || requestMatchInfo.getMethodInvokeInfo() == null) {
             response.getWriter().print("404 The origin server did not find a current representation for the target resource (ControlTool)");
             response.setStatus(404);
             return;
@@ -54,10 +55,18 @@ public class DispatcherServlet {
             reqReturnObject = requestMappingHandler.request(requestMatchInfo);
         } catch (Exception e) {
             e.printStackTrace();
+            rewriteToClient(response, e.getMessage());
             return;
         }
 
-        rewriteToClient(response, LOAD_JSON_TO_CLASS.toJson(reqReturnObject));
+//        rewriteToClient(response, LOAD_JSON_TO_CLASS.toJson(reqReturnObject));
+        try {
+            rewriteToClient(response, applicationContext.tryGetBean(DefaultDataObjectSerialize.class).toJson(reqReturnObject));
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
 
         RequestContextHolder.remove();
     }

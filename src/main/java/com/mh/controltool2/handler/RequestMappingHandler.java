@@ -10,6 +10,7 @@ import com.mh.controltool2.method.MethodInvokeInfo;
 import com.mh.controltool2.method.URLInvokeTree;
 import com.mh.controltool2.method.type.*;
 import com.mh.controltool2.serialize.BaseDataTypeChange;
+import com.mh.controltool2.serialize.json.DefaultDataObjectSerialize;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -131,7 +132,16 @@ public class RequestMappingHandler {
             sb.append(temporaryLineContent);
         }
 
-        return json.fromJson(sb.toString(),invokeRequestBody.getParameterizedType());
+//        return json.fromJson(sb.toString(),invokeRequestBody.getParameterizedType());
+
+        try {
+            return applicationContext.tryGetBean(DefaultDataObjectSerialize.class).toObject(sb.toString(),invokeRequestBody.getParameterizedType());
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private Object paramDataToPathVariable(InvokePathVariable invokePathVariable, RequestMatchInfo requestMatchInfo) throws UnsupportedSerializeObjectException,ParamDataIsEmptyException,NumberFormatException {
