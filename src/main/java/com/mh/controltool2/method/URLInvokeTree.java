@@ -34,6 +34,7 @@ public class URLInvokeTree implements MatchInvokeObject {
             matchInvokeObject = new MatchInvokeObject() {
                 @Override
                 public MethodInvokeInfo getMatchInvokeObject(String trueRequestMethod) {
+                    if (requestMethod == RequestMethod.Full) return methodInvokeInfo;
                     RequestMethod clientReqMethod = null;
                     switch (trueRequestMethod) {
                         case "GET":
@@ -58,11 +59,7 @@ public class URLInvokeTree implements MatchInvokeObject {
                             clientReqMethod = RequestMethod.TRACE;
                             break;
                     }
-                    MethodInvokeInfo matchMethodInvokeInfo = requestMethodInvokeInfoMap.get(clientReqMethod);
-                    if (matchMethodInvokeInfo != null) {
-                        return matchMethodInvokeInfo;
-                    }
-                    return requestMethodInvokeInfoMap.get(RequestMethod.Full);
+                    return  requestMethod == clientReqMethod ? methodInvokeInfo : null;
                 }
             };
         } else if (matchInvokeObject != multipleInvokeObject) {
