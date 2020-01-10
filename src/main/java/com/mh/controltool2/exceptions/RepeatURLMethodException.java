@@ -1,6 +1,5 @@
 package com.mh.controltool2.exceptions;
 
-import java.util.Arrays;
 
 public class RepeatURLMethodException extends RuntimeException {
 
