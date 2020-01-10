@@ -144,8 +144,6 @@ public class RequestMappingHandler {
             sb.append(temporaryLineContent);
         }
 
-//        return json.fromJson(sb.toString(),invokeRequestBody.getParameterizedType());
-
         return dataObjectSerialize.toObject(sb.toString(),invokeRequestBody.getParameterizedType());
     }
 
