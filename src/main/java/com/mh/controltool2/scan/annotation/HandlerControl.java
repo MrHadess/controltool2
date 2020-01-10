@@ -20,6 +20,8 @@ import java.util.regex.Pattern;
 
 public class HandlerControl implements PackageProcessHandler {
 
+    private static final String TAG = "HandlerControl";
+
     private Pattern urlWarnPattern = Pattern.compile("(/+|.*?)(/{2,})(/+|.*?)");//检查是否存在多个"/"斜杠以作出提示（需要附加相关响应控制器的位置信息）
     private Pattern checkVarMatch = Pattern.compile(".+?[{].+?[}].*?");//简单检查是否存在"XX/{ZZZZZ}/XXXX/{ZZZZZZ}/XXXXX"格式的字符串(存在时则认为存在相关动态变量，将进行相关流程处理)
 //    private Pattern checkVarMatch = Pattern.compile(".+?[{].+?[}].+?");//简单检查是否存在"XX/{ZZZZZ}/XXXX/{ZZZZZZ}/XXXXX"格式的字符串(存在时则认为存在相关动态变量，将进行相关流程处理)
@@ -40,17 +42,13 @@ public class HandlerControl implements PackageProcessHandler {
             RestController restControllerModuleClass = item.getAnnotation(RestController.class);
             //当此类不存在控制器时 不加入URL匹配Map中
             if (restControllerModuleClass == null) continue;
-            LogOut.i("-----------------------------------------------------------");
-            LogOut.i("This has RestController:::" + item);
 
             String className = item.getName();
-
             //控制器根Mapping前缀匹配
             String urlFirstMatch = "";
             RequestMapping requestMappingClass = item.getAnnotation(RequestMapping.class);
             if (requestMappingClass != null) {
                 String value = requestMappingClass.value().trim();
-                LogOut.i("This has RequestMapping:::" + item + "  value=" + requestMappingClass.value());
                 if (!value.isEmpty()) {
                     urlFirstMatch = value;
                 }
@@ -68,20 +66,16 @@ public class HandlerControl implements PackageProcessHandler {
 
         for (Method method : methods) {
 
-            LogOut.i("++++++++++++++" );
-            LogOut.i("Now method name:" + method.getName() );
-
-
             RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
             if (requestMapping == null) {
-                LogOut.i("Does not RequestMapping");
+                printErrLog(matchClass,method,"Does not RequestMapping");
                 continue;
             }
 
 
             String requestMappingValue = requestMapping.value().trim();
             if (requestMappingValue.isEmpty()) {
-                LogOut.i("Does not RequestMapping Value");
+                printErrLog(matchClass,method,"Does not RequestMapping Value");
                 continue;
             }
 
@@ -90,7 +84,8 @@ public class HandlerControl implements PackageProcessHandler {
             //URL格式检查，URL拼接后"/"是否存在连续重叠的问题
             Matcher urlWarnMatch = urlWarnPattern.matcher(matchURl);
             if (urlWarnMatch.matches()) {
-                LogOut.i("Warn:URL warn\'" + matchURl + "\' Class:" + className + "." + method.getName());
+                printErrLog(matchClass,method,"Warn:URL warn\'" + matchURl + "\' Class:" + className + "." + method.getName());
+                continue;
             }
 
             //对URl进行分析,分析是否采取模糊匹配(URL模板)进行匹配
@@ -107,7 +102,7 @@ public class HandlerControl implements PackageProcessHandler {
             try {
                 invokeObjectInfoGroup = checkMatchInvokeInfo.checkToInvokeObjectGroup(matchURl,method);
             } catch (MultipleAnnotationException e) {
-                e.printStackTrace();
+                printErrLog(matchClass,method,"Method param has multiple annotation");
             }
 
             methodInvokeInfo.setInvokeObjectInfoGroup(invokeObjectInfoGroup);
@@ -121,10 +116,11 @@ public class HandlerControl implements PackageProcessHandler {
                     updateAbsolutelyMatch(matchURl,methodInvokeInfo,requestMapping);
                 }
             } catch (RepeatURLMethodException e) {
-                e.printStackTrace();
+                String message = String.format("Has replace url {first:'%s.%s',lost:'%s.%s'}",e.getOldClass(),e.getOldMethod(),e.getNewClass(),e.getNewMethod());
+                printErrLog(matchClass,method,message);
             }
 
-
+            LogOut.e(TAG,String.format("%s.%s--Handler mapping to url:'%s'",matchClass.getName(),method.getName(),matchURl));
 
         }
 
@@ -155,6 +151,10 @@ public class HandlerControl implements PackageProcessHandler {
             urlAbsolutelyMap.put(matchURl,urlInvokeTree);
         }
 
+    }
+
+    private void printErrLog(Class<?> tClass, Method method, String message) {
+        LogOut.e(TAG,String.format("%s.%s  %s",tClass.getName(),method.getName(),message));
     }
 
     public HashMap<String, URLInvokeTree> getUrlAbsolutelyMap() {

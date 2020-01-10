@@ -20,7 +20,7 @@ public class LogOut {
     }
 
     public static void e(String tag, Object errObject) {
-        System.out.println("ControlTool=>Error" + tag + ":" + String.valueOf(errObject));
+        System.out.println("ControlTool=>Error " + tag + ":" + String.valueOf(errObject));
     }
 
     public static void i(String info) {
