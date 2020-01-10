@@ -3,7 +3,6 @@ package com.mh.controltool2.handler;
 import com.mh.controltool2.ApplicationContext;
 import com.mh.controltool2.exceptions.invoke.BeanInstantiationException;
 import com.mh.controltool2.exceptions.invoke.ParamDataIsEmptyException;
-import com.mh.controltool2.exceptions.invoke.RequestMappingHandlerErrorException;
 import com.mh.controltool2.exceptions.invoke.UnsupportedSerializeObjectException;
 import com.mh.controltool2.handler.pojo.RequestMatchInfo;
 import com.mh.controltool2.method.MethodInvokeInfo;
@@ -73,7 +72,7 @@ public class RequestMappingHandler {
         return null;
     }
 
-    protected Object request(RequestMatchInfo requestMatchInfo) throws IOException, InvocationTargetException, IllegalAccessException,RequestMappingHandlerErrorException  {
+    protected Object request(RequestMatchInfo requestMatchInfo) throws IOException, InvocationTargetException, IllegalAccessException  {
 
         HttpServletRequest request = RequestContextHolder.getHttpServletRequest();
 
@@ -109,17 +108,10 @@ public class RequestMappingHandler {
             }
         }
 
-
-        try {
-            return methodInvokeInfo.getMethodName().invoke(
-                    applicationContext.tryGetBean(methodInvokeInfo.getClassname()),
-                    methodParamObject
-            );
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RequestMappingHandlerErrorException(e);
-        }
+        return methodInvokeInfo.getMethodName().invoke(
+                applicationContext.tryGetBean(methodInvokeInfo.getClassname()),
+                methodParamObject
+        );
 
     }
 

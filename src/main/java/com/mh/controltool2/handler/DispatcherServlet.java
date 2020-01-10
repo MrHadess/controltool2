@@ -3,8 +3,8 @@ package com.mh.controltool2.handler;
 
 import com.mh.controltool2.ApplicationContext;
 import com.mh.controltool2.Config;
+import com.mh.controltool2.dto.HandlerErrorInfo;
 import com.mh.controltool2.exceptions.invoke.BeanInstantiationException;
-import com.mh.controltool2.exceptions.invoke.RequestMappingHandlerErrorException;
 import com.mh.controltool2.handler.pojo.RequestMatchInfo;
 import com.mh.controltool2.serialize.json.DataObjectSerialize;
 import com.mh.controltool2.serialize.json.DefaultDataObjectSerialize;
@@ -23,6 +23,8 @@ import java.lang.reflect.InvocationTargetException;
 *
 * */
 public class DispatcherServlet {
+
+    private static final String CONTENT_TYPE_APPLICATION_JSON_UTF_8 = "application/json;utf-8";
 
     private ApplicationContext applicationContext;
     private DataObjectSerialize dataObjectSerialize;
@@ -67,16 +69,22 @@ public class DispatcherServlet {
         Object reqReturnObject = null;
         try {
             reqReturnObject = requestMappingHandler.request(requestMatchInfo);
-        } catch (IOException e) {
-            throw e;
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
-            rewriteToClient(response, e.getMessage());
+            response.setContentType(CONTENT_TYPE_APPLICATION_JSON_UTF_8);
+            HandlerErrorInfo handlerErrorInfo = new HandlerErrorInfo();
+            handlerErrorInfo.setMessage("Method access fail");
+            handlerErrorInfo.setThrowableStack(e);
+            rewriteToClient(response, dataObjectSerialize.toJson(handlerErrorInfo));
             return;
-        } catch (RequestMappingHandlerErrorException e) {
+        } catch (InvocationTargetException e) {
             // use to 'handler interceptor'
             e.getCause().printStackTrace();
-            rewriteToClient(response, e.getCause().getMessage());
+            response.setContentType(CONTENT_TYPE_APPLICATION_JSON_UTF_8);
+            HandlerErrorInfo handlerErrorInfo = new HandlerErrorInfo();
+            handlerErrorInfo.setMessage("Control throw exception");
+            handlerErrorInfo.setThrowableStack(e.getCause());
+            rewriteToClient(response, dataObjectSerialize.toJson(handlerErrorInfo));
             return;
         }
 

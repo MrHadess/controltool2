@@ -23,8 +23,6 @@ public class Config {
     * default load file 'control_tool.properties'
     *
     * */
-//    @Deprecated
-//    private ApplicationContext() { }
 
     private Config(ServletConfig servletConfig) {
         String needScanPackages = servletConfig.getInitParameter("ScanPkg");
