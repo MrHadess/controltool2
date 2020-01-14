@@ -99,7 +99,7 @@ public class RequestMappingHandler {
                     methodParamObject[i] = paramDataToPathVariable((InvokePathVariable)invokeObjectInfoGroup[i],requestMatchInfo);
                     break;
                 case SupportDefaultValue:
-                    methodParamObject[i] = paramDataToPathVariable((InvokeDefaultValue)invokeObjectInfoGroup[i]);
+                    methodParamObject[i] = paramDataToSupportDefaultValue((InvokeDefaultValue)invokeObjectInfoGroup[i]);
                     break;
                 case Unmatched:
                 default:
@@ -144,7 +144,7 @@ public class RequestMappingHandler {
         return BaseDataTypeChange.stringToBaseData(invokePathVariable.getArgClass().getName(),data);
     }
 
-    private Object paramDataToPathVariable(InvokeDefaultValue invokeDefaultValue) {
+    private Object paramDataToSupportDefaultValue(InvokeDefaultValue invokeDefaultValue) {
         Class<?> tClass = invokeDefaultValue.getArgClass();
         if (HttpServletRequest.class.isAssignableFrom(tClass)) {
             return tClass.cast(RequestContextHolder.getHttpServletRequest());
