@@ -59,8 +59,9 @@ public class RequestMappingHandler {
             );
         }
 
+        Matcher matcher;
         for (Map.Entry<Pattern, URLInvokeTree> item : urlFuzzyMap.entrySet()) {
-            Matcher matcher = item.getKey().matcher(reqPathInfo);
+            matcher = item.getKey().matcher(reqPathInfo);
             if (!matcher.matches()) continue;
             return RequestMatchInfo.CreateRequestMatchFuzzy(
                     reqPathInfo,

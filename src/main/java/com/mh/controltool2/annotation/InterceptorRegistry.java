@@ -19,7 +19,7 @@ public class InterceptorRegistry {
     /**
      * Return all registered interceptors.
      */
-    protected List<InterceptorRegistration> getInterceptors() {
+    public List<InterceptorRegistration> getInterceptors() {
         return this.registrations;
     }
 
