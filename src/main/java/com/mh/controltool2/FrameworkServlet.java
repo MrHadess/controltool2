@@ -3,7 +3,8 @@ package com.mh.controltool2;
 import com.mh.controltool2.context.FullApplicationContext;
 import com.mh.controltool2.handler.DispatcherServlet;
 
-import javax.servlet.*;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +23,7 @@ public class FrameworkServlet extends HttpServlet {
 
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
-        System.out.println("Control Tool version:2.0.0Bate");
+        System.out.println("Control Tool version:2.0.0");
 //        System.out.println(logo);
         LogOut.i("FrameworkServlet initiation");
 

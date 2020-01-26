@@ -29,8 +29,8 @@ public class HandlerConfig implements PackageProcessHandler {
             if (annotationConfiguration == null) continue;
 
             // Create config Configurer
-            if (!item.isAssignableFrom(Configurer2.class)) {
-                LogOut.e("Unmatch");
+            if (!Configurer2.class.isAssignableFrom(item)) {
+                LogOut.e(TAG,"Class unmatched 'Configurer2' => " + item.getName());
                 continue;
             }
 
