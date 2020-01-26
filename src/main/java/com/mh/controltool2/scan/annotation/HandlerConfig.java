@@ -2,21 +2,20 @@ package com.mh.controltool2.scan.annotation;
 
 import com.mh.controltool2.LogOut;
 import com.mh.controltool2.annotation.Configuration;
-import com.mh.controltool2.annotation.InterceptorRegistration;
-import com.mh.controltool2.annotation.InterceptorRegistry;
-import com.mh.controltool2.config.annotation.Configurer;
+import com.mh.controltool2.config.LoadConfigurer;
+import com.mh.controltool2.config.MappedInterceptor;
 import com.mh.controltool2.config.annotation.Configurer2;
 import com.mh.controltool2.scan.PackageProcessHandler;
-import com.mh.controltool2.servlet.HandlerInterceptor;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class HandlerConfig implements PackageProcessHandler {
 
     private static final String TAG = "HandlerConfig";
+
+    private List<MappedInterceptor> mappedInterceptorList = new ArrayList<>();
 
     @Override
     public void loadFullPackageData(List<Class<?>> classList) {
@@ -46,39 +45,33 @@ public class HandlerConfig implements PackageProcessHandler {
                 LogOut.e(TAG,"Class has no nullify constructor ==>" + item.getName());
             }
 
+            LogOut.i(TAG,String.format("Use config:%s",item.getName()));
+
             try {
-                Configurer configurer = (Configurer) item.newInstance();
+                Configurer2 configurer = (Configurer2) item.newInstance();
 
-                createConfig((Class<Configurer2>) item);
-
-
+                LoadConfigurer loadConfigurer = new LoadConfigurer(configurer);
+                mappedInterceptorList = loadConfigurer.getMappedInterceptorList();
 
                 return;
             } catch (InstantiationException e) {
-                e.printStackTrace();
+                e.getCause().printStackTrace();
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-
         }
 
 
     }
 
-
-    private void createConfig(Class<Configurer2> tClass) throws IllegalAccessException, InstantiationException {
-        Configurer2 configurer = tClass.newInstance();
-
-        InterceptorRegistry interceptorRegistry = new InterceptorRegistry();
-        configurer.addInterceptors(interceptorRegistry);
-
-        List<InterceptorRegistration> interceptorRegistrationList = interceptorRegistry.getInterceptors();
-        for (InterceptorRegistration item:interceptorRegistrationList) {
-
-        }
-
-
+    public List<MappedInterceptor> getMappedInterceptorList() {
+        return mappedInterceptorList;
     }
 
-
+    @Override
+    public String toString() {
+        return "HandlerConfig{" +
+                "mappedInterceptorList=" + mappedInterceptorList +
+                '}';
+    }
 }

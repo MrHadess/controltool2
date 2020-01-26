@@ -1,8 +1,6 @@
 package com.mh.controltool2.config.annotation;
 
-import com.mh.controltool2.annotation.InterceptorRegistry;
-
-import java.util.List;
+import com.mh.controltool2.config.InterceptorRegistry;
 
 public interface Configurer2 {
 

@@ -5,6 +5,7 @@ import com.mh.controltool2.ApplicationContext;
 import com.mh.controltool2.Config;
 import com.mh.controltool2.dto.HandlerErrorInfo;
 import com.mh.controltool2.exceptions.invoke.BeanInstantiationException;
+import com.mh.controltool2.exceptions.invoke.HandlerThrowException;
 import com.mh.controltool2.handler.pojo.RequestMatchInfo;
 import com.mh.controltool2.serialize.json.DataObjectSerialize;
 import com.mh.controltool2.serialize.json.DefaultDataObjectSerialize;
@@ -29,6 +30,7 @@ public class DispatcherServlet {
     private ApplicationContext applicationContext;
     private DataObjectSerialize dataObjectSerialize;
 
+    private RequestInterceptorHandler requestInterceptorHandler;
     private RequestMappingHandler requestMappingHandler;
 
     // init assembly
@@ -36,13 +38,14 @@ public class DispatcherServlet {
         this.applicationContext = applicationContext;
         dataObjectSerialize = applicationContext.tryGetBean(DefaultDataObjectSerialize.class);
         // bean group (Unrealized)
+        // handler interceptor (Unrealized)
+        requestInterceptorHandler = new RequestInterceptorHandler(config.getHandlerConfig().getMappedInterceptorList());
         // request mapping
         requestMappingHandler = new RequestMappingHandler(
                 applicationContext,
                 config.getHandlerControl().getUrlAbsolutelyMap(),
                 config.getHandlerControl().getUrlFuzzyMap()
         );
-        // handler interceptor (Unrealized)
     }
 
     public void handlerRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -66,25 +69,43 @@ public class DispatcherServlet {
             return;
         }
 
+        // try handler interceptor
+        try {
+            requestInterceptorHandler.cleanInterceptorStack();
+            boolean interceptorPreHandlerState = requestInterceptorHandler.request(requestMatchInfo.getMethodInvokeInfo().getMethodName());
+            if (!interceptorPreHandlerState) return;// cut next handler
+        } catch (HandlerThrowException e) {
+            e.getCause().printStackTrace();
+            rewriteExceptionToClient(response,"Interceptor handler throw exception",e.getCause());
+            return;
+        }
+
         Object reqReturnObject = null;
         try {
             reqReturnObject = requestMappingHandler.request(requestMatchInfo);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-            response.setContentType(CONTENT_TYPE_APPLICATION_JSON_UTF_8);
-            HandlerErrorInfo handlerErrorInfo = new HandlerErrorInfo();
-            handlerErrorInfo.setMessage("Method access fail");
-            handlerErrorInfo.setThrowableStack(e);
-            rewriteToClient(response, dataObjectSerialize.toJson(handlerErrorInfo));
+            rewriteExceptionToClient(response,"Method access fail",e);
             return;
         } catch (InvocationTargetException e) {
             // use to 'handler interceptor'
             e.getCause().printStackTrace();
-            response.setContentType(CONTENT_TYPE_APPLICATION_JSON_UTF_8);
-            HandlerErrorInfo handlerErrorInfo = new HandlerErrorInfo();
-            handlerErrorInfo.setMessage("Control throw exception");
-            handlerErrorInfo.setThrowableStack(e.getCause());
-            rewriteToClient(response, dataObjectSerialize.toJson(handlerErrorInfo));
+            // use interceptor handler exception
+            try {
+                requestInterceptorHandler.requestHandlerAfter(requestMatchInfo.getMethodInvokeInfo().getMethodName(), (Exception) e.getCause());
+            } catch (HandlerThrowException requestInterceptorHandlerEx) {
+                e.getCause().addSuppressed(requestInterceptorHandlerEx.getCause());
+            }
+            rewriteExceptionToClient(response,"Control throw exception",e.getCause());
+            return;
+        }
+
+        try {
+            requestInterceptorHandler.requestHandlerAfter(requestMatchInfo.getMethodInvokeInfo().getMethodName(),null);
+        } catch (HandlerThrowException e) {
+            // use to 'handler interceptor'
+            e.getCause().printStackTrace();
+            rewriteExceptionToClient(response,"Interceptor throw exception",e.getCause());
             return;
         }
 
@@ -100,6 +121,13 @@ public class DispatcherServlet {
         respWriter.flush();
     }
 
+    private void rewriteExceptionToClient(HttpServletResponse response,String msg,Throwable e) throws IOException {
+        response.setContentType(CONTENT_TYPE_APPLICATION_JSON_UTF_8);
+        HandlerErrorInfo handlerErrorInfo = new HandlerErrorInfo();
+        handlerErrorInfo.setMessage(msg);
+        handlerErrorInfo.setThrowableStack(e);
+        rewriteToClient(response, dataObjectSerialize.toJson(handlerErrorInfo));
+    }
 
 
 

@@ -1,4 +1,4 @@
-package com.mh.controltool2.annotation;
+package com.mh.controltool2.config;
 
 import com.mh.controltool2.servlet.HandlerInterceptor;
 
@@ -19,7 +19,7 @@ public class InterceptorRegistry {
     /**
      * Return all registered interceptors.
      */
-    public List<InterceptorRegistration> getInterceptors() {
+    protected List<InterceptorRegistration> getInterceptors() {
         return this.registrations;
     }
 

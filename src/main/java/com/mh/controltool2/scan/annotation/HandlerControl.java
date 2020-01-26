@@ -8,7 +8,7 @@ import com.mh.controltool2.exceptions.scan.MultipleAnnotationException;
 import com.mh.controltool2.method.MethodInvokeInfo;
 import com.mh.controltool2.method.URLInvokeTree;
 import com.mh.controltool2.method.type.InvokeObjectInfo;
-import com.mh.controltool2.scan.*;
+import com.mh.controltool2.scan.PackageProcessHandler;
 import com.mh.controltool2.scan.annotation.handler.control.CheckMatchInvokeInfo;
 import com.mh.controltool2.scan.fuzzymatch.FuzzyURLMatchToInfo;
 
@@ -128,7 +128,7 @@ public class HandlerControl implements PackageProcessHandler {
 
     private void updateFuzzyMatch(String matchURl, MethodInvokeInfo methodInvokeInfo, RequestMapping requestMapping) throws RepeatURLMethodException {
 
-        Pattern urlPattern = FuzzyURLMatchToInfo.urlCoverTopPattern(matchURl);
+        Pattern urlPattern = FuzzyURLMatchToInfo.urlCoverToPattern(matchURl);
         URLInvokeTree urlInvokeTree = urlFuzzyMap.get(urlPattern);
         if (urlInvokeTree != null) {
             urlInvokeTree.addInvokeInfo(methodInvokeInfo,requestMapping.method());
