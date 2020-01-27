@@ -64,8 +64,8 @@ public class DispatcherServlet {
         RequestMatchInfo requestMatchInfo = requestMappingHandler.requestMatchMethodInvokeInfo();
 
         if (requestMatchInfo == null || requestMatchInfo.getMethodInvokeInfo() == null) {
-            response.getWriter().print("404 The origin server did not find a current representation for the target resource (ControlTool)");
             response.setStatus(404);
+            rewriteToClient(response,"404 The origin server did not find a current representation for the target resource (ControlTool)");
             return;
         }
 
