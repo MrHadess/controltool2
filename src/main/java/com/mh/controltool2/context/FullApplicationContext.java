@@ -2,6 +2,7 @@ package com.mh.controltool2.context;
 
 import com.mh.controltool2.ApplicationContext;
 import com.mh.controltool2.annotation.Autowired;
+import com.mh.controltool2.annotation.Bean;
 import com.mh.controltool2.exceptions.BeanFactoryException;
 import com.mh.controltool2.exceptions.invoke.BeanInstantiationException;
 import com.mh.controltool2.util.Assert;
@@ -12,7 +13,9 @@ import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /*
 * Global value
@@ -22,6 +25,7 @@ public class FullApplicationContext implements ApplicationContext {
     private static final String PACKAGE_NAME_LANG = "java.lang";
 
     private final Map<String,Object> objectMap = new ConcurrentHashMap<>();
+    private final Set<String> creatingClassSet = new ConcurrentSkipListSet<>();
 
     @Override
     public <T> T tryGetBean(Class<T> tClass) throws BeanFactoryException,BeanInstantiationException {
@@ -44,8 +48,13 @@ public class FullApplicationContext implements ApplicationContext {
     }
 
     @Override
-    public <T> T tryGetBean(String name, Class<? extends T> tClassImpl) throws BeanFactoryException, BeanInstantiationException {
-        return null;
+    public Object tryGetBean(String name, Class<?> tClassImpl) throws BeanFactoryException, BeanInstantiationException {
+        Object obj = objectMap.get(name);
+        if (obj != null) {
+            return tClassImpl.cast(obj);
+        }
+        // try create obj
+        return absoluteCreateObj(name,tClassImpl);
     }
 
     @Override
@@ -107,6 +116,24 @@ public class FullApplicationContext implements ApplicationContext {
     }
 
     private synchronized <T> T createObj(Class<T> tClass, Class<? extends T> tClassImpl) throws BeanFactoryException,BeanInstantiationException {
+        if (!tClass.isAssignableFrom(tClassImpl)) {
+            throw new BeanFactoryException(
+                    BeanFactoryException.ExpType.NotAssignableFromClass,
+                    String.format("Target class:'%s',class impl name:'%s'",tClass.getName(),tClassImpl.getName())
+            );
+        }
+        return tClass.cast(createObj(tClass.getName(),tClassImpl));
+    }
+
+    private synchronized Object createObj(String beanName, Class<?> tClassImpl) throws BeanFactoryException,BeanInstantiationException {
+        try {
+            return absoluteCreateObj(beanName,tClassImpl);
+        } finally {
+            creatingClassSet.remove(tClassImpl.getName());
+        }
+    }
+
+    private synchronized Object absoluteCreateObj(String beanName, Class<?> tClassImpl) throws BeanFactoryException,BeanInstantiationException {
         // First check public constructors has empty or has 'Autowired' annotation
         if (tClassImpl.isInterface()) {
             throw new BeanFactoryException(BeanFactoryException.ExpType.IsInterface,tClassImpl.getName());
@@ -114,6 +141,11 @@ public class FullApplicationContext implements ApplicationContext {
         if (PACKAGE_NAME_LANG.startsWith(tClassImpl.getName())) {
             throw new BeanFactoryException(BeanFactoryException.ExpType.UnsupportedDataType,tClassImpl.getName());
         }
+        if (creatingClassSet.contains(tClassImpl.getName())) {
+            throw new BeanFactoryException(BeanFactoryException.ExpType.CurrentlyInCreation,tClassImpl.getName());
+        }
+
+        creatingClassSet.add(tClassImpl.getName());
 
         boolean hasEmptyConstructors = false;
         Constructor[] constructors = tClassImpl.getConstructors();
@@ -131,10 +163,10 @@ public class FullApplicationContext implements ApplicationContext {
         // Auto chose first class constructors init object
         if (supportAutowiredConstructorList.isEmpty()) {
             // Go to create empty constructor
-            return createEmptyConstructorObj(tClass,tClassImpl);
+            return createEmptyConstructorObj(beanName,tClassImpl);
         }
         // Next try create has 'autowired' annotation constructors (Is random mode)
-        Object[] paramTypeObject = null;
+        Object[] paramTypeObject;
         for (Constructor item:supportAutowiredConstructorList) {
             // If 'autowired' annotation has bean name ,first use it to bean name
             try {
@@ -144,7 +176,7 @@ public class FullApplicationContext implements ApplicationContext {
                     case IsInterface:
                     case UnsupportedDataType:
                         continue;
-                    // If unsupported type use next init object
+                        // If unsupported type use next init object
                     default:
                         throw e;
                 }
@@ -153,8 +185,8 @@ public class FullApplicationContext implements ApplicationContext {
             try {
                 synchronized (this.objectMap) {
                     Object obj = item.newInstance(paramTypeObject);;
-                    objectMap.put(tClass.getName(),obj);
-                    return tClass.cast(obj);
+                    objectMap.put(beanName,obj);
+                    return obj;
                 }
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new BeanInstantiationException(e);
@@ -164,10 +196,10 @@ public class FullApplicationContext implements ApplicationContext {
 
         // If nothing init object,then try use empty constructor
         if (hasEmptyConstructors) {
-            return createEmptyConstructorObj(tClass,tClassImpl);
+            return createEmptyConstructorObj(beanName,tClassImpl);
         }
 
-        throw new BeanInstantiationException(tClass.getName());
+        throw new BeanInstantiationException(beanName);
     }
 
     private Object[] loadParamObjects(Constructor constructor) throws BeanFactoryException {
@@ -175,13 +207,28 @@ public class FullApplicationContext implements ApplicationContext {
         Class<?>[] itemParameterTypes = constructor.getParameterTypes();
         Object[] paramTypeObject = new Object[itemParameterTypes.length];
         for (int index = 0;index < itemParameterTypes.length;index++) {
+//            Autowired autowiredAnnotation = itemTypeParameters[index].getAnnotation(Autowired.class);
+//            if (autowiredAnnotation != null) {
+//                paramTypeObject[index] = tryGetBean(itemParameterTypes[index]);
+//            } else {
+//                // input null
+//                paramTypeObject[index] = null;
+//            }
+
             Autowired autowiredAnnotation = itemTypeParameters[index].getAnnotation(Autowired.class);
             if (autowiredAnnotation != null) {
                 paramTypeObject[index] = tryGetBean(itemParameterTypes[index]);
-            } else {
-                // input null
-                paramTypeObject[index] = null;
+                continue;
             }
+
+            Bean beanAnnotation = itemTypeParameters[index].getAnnotation(Bean.class);
+            if (beanAnnotation != null && "".equals(beanAnnotation.name())) {
+                // input null
+                paramTypeObject[index] = tryGetBean(beanAnnotation.name(),itemParameterTypes[index]);
+                continue;
+            }
+
+            paramTypeObject[index] = null;
         }
         return paramTypeObject;
     }
@@ -191,6 +238,18 @@ public class FullApplicationContext implements ApplicationContext {
             synchronized (this.objectMap) {
                 T obj = tClassImpl.newInstance();
                 objectMap.put(tClass.getName(),obj);
+                return obj;
+            }
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new BeanInstantiationException(e);
+        }
+    }
+
+    private synchronized <T> T createEmptyConstructorObj(String beanName, Class<? extends T> tClassImpl) throws BeanFactoryException,BeanInstantiationException {
+        try {
+            synchronized (this.objectMap) {
+                T obj = tClassImpl.newInstance();
+                objectMap.put(beanName,obj);
                 return obj;
             }
         } catch (InstantiationException | IllegalAccessException e) {

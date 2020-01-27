@@ -95,8 +95,8 @@ public class HandlerControl implements PackageProcessHandler {
             boolean isFuzzyURL = urlMatchModul.matches() || urlMatchModul2.matches();
 
             MethodInvokeInfo methodInvokeInfo = new MethodInvokeInfo();
-            methodInvokeInfo.setClassname(matchClass);
-            methodInvokeInfo.setMethodName(method);
+            methodInvokeInfo.setTargetClass(matchClass);
+            methodInvokeInfo.setTargetMethod(method);
 
             InvokeObjectInfo[] invokeObjectInfoGroup = null;
             try {

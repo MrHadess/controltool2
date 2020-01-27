@@ -7,24 +7,24 @@ import java.util.Arrays;
 
 public class MethodInvokeInfo {
 
-    private Class<?> classname;
-    private Method methodName;
+    private Class<?> targetClass;
+    private Method targetMethod;
     private InvokeObjectInfo[] invokeObjectInfoGroup;
 
-    public Class<?> getClassname() {
-        return classname;
+    public Class<?> getTargetClass() {
+        return targetClass;
     }
 
-    public void setClassname(Class<?> classname) {
-        this.classname = classname;
+    public void setTargetClass(Class<?> targetClass) {
+        this.targetClass = targetClass;
     }
 
-    public Method getMethodName() {
-        return methodName;
+    public Method getTargetMethod() {
+        return targetMethod;
     }
 
-    public void setMethodName(Method methodName) {
-        this.methodName = methodName;
+    public void setTargetMethod(Method targetMethod) {
+        this.targetMethod = targetMethod;
     }
 
     public InvokeObjectInfo[] getInvokeObjectInfoGroup() {
@@ -38,8 +38,8 @@ public class MethodInvokeInfo {
     @Override
     public String toString() {
         return "MethodInvokeInfo{" +
-                "classname='" + classname + '\'' +
-                ", methodName='" + methodName + '\'' +
+                "targetClass='" + targetClass + '\'' +
+                ", targetMethod='" + targetMethod + '\'' +
                 ", invokeObjectInfoGroup=" + Arrays.toString(invokeObjectInfoGroup) +
                 '}';
     }

@@ -109,8 +109,8 @@ public class RequestMappingHandler {
             }
         }
 
-        return methodInvokeInfo.getMethodName().invoke(
-                applicationContext.tryGetBean(methodInvokeInfo.getClassname()),
+        return methodInvokeInfo.getTargetMethod().invoke(
+                applicationContext.tryGetBean(methodInvokeInfo.getTargetClass()),
                 methodParamObject
         );
 

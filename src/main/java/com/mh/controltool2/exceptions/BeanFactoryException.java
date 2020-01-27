@@ -24,6 +24,8 @@ public class BeanFactoryException extends RuntimeException {
     }
 
     public enum ExpType {
+        CurrentlyInCreation("Currently in creation -> creating class:"),
+        NotAssignableFromClass("Not assignable from class"),
         IsInterface("Class is interface"),
         UnsupportedDataType("Unsupported data type"),
         ReplaceBean("Has replace bean"),

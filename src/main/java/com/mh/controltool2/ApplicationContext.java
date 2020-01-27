@@ -16,7 +16,7 @@ public interface ApplicationContext {
 
     <T> T tryGetBean(Class<T> tClass,Class<? extends T> tClassImpl) throws BeanFactoryException,BeanInstantiationException;
 
-    <T> T tryGetBean(String name,Class<? extends T> tClassImpl) throws BeanFactoryException,BeanInstantiationException;
+    Object tryGetBean(String name,Class<?> tClassImpl) throws BeanFactoryException,BeanInstantiationException;
 
     <T> T getBean(Class<T> tClass);
 

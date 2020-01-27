@@ -72,7 +72,7 @@ public class DispatcherServlet {
         // try handler interceptor
         try {
             requestInterceptorHandler.cleanInterceptorStack();
-            boolean interceptorPreHandlerState = requestInterceptorHandler.request(requestMatchInfo.getMethodInvokeInfo().getMethodName());
+            boolean interceptorPreHandlerState = requestInterceptorHandler.request(requestMatchInfo.getMethodInvokeInfo().getTargetMethod());
             if (!interceptorPreHandlerState) return;// cut next handler
         } catch (HandlerThrowException e) {
             e.getCause().printStackTrace();
@@ -92,7 +92,7 @@ public class DispatcherServlet {
             e.getCause().printStackTrace();
             // use interceptor handler exception
             try {
-                requestInterceptorHandler.requestHandlerAfter(requestMatchInfo.getMethodInvokeInfo().getMethodName(), (Exception) e.getCause());
+                requestInterceptorHandler.requestHandlerAfter(requestMatchInfo.getMethodInvokeInfo().getTargetMethod(), (Exception) e.getCause());
             } catch (HandlerThrowException requestInterceptorHandlerEx) {
                 e.getCause().addSuppressed(requestInterceptorHandlerEx.getCause());
             }
@@ -101,7 +101,7 @@ public class DispatcherServlet {
         }
 
         try {
-            requestInterceptorHandler.requestHandlerAfter(requestMatchInfo.getMethodInvokeInfo().getMethodName(),null);
+            requestInterceptorHandler.requestHandlerAfter(requestMatchInfo.getMethodInvokeInfo().getTargetMethod(),null);
         } catch (HandlerThrowException e) {
             // use to 'handler interceptor'
             e.getCause().printStackTrace();
