@@ -1,5 +1,6 @@
 package com.mh.controltool2;
 
+import com.mh.controltool2.context.BeanUtil;
 import com.mh.controltool2.context.FullApplicationContext;
 import com.mh.controltool2.handler.DispatcherServlet;
 
@@ -28,7 +29,13 @@ public class FrameworkServlet extends HttpServlet {
         LogOut.i("FrameworkServlet initiation");
 
         config = Config.create(servletConfig);
+        // load bean from config
+        BeanUtil.tryBeanMapToContext(applicationContext,config.getHandlerConfig().getBeanMap());
+        // load full bean
+        BeanUtil.tryLoadBeansToContext(applicationContext,config.getHandlerBean().getScanBeanMap());
+        // init dispatch servlet
         dispatcherServlet.init(config,applicationContext);
+
 
     }
 

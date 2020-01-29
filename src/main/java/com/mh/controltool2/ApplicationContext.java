@@ -23,7 +23,7 @@ public interface ApplicationContext {
     Object getBean(String name);
 
     /*
-    * 'addBean' reject same bean register
+    * 'registerBean' reject same bean register
     * */
 
     void addBean(Class<?> tClass,Object obj) throws BeanFactoryException;

@@ -102,6 +102,9 @@ public class RequestMappingHandler {
                 case SupportDefaultValue:
                     methodParamObject[i] = paramDataToSupportDefaultValue((InvokeDefaultValue)invokeObjectInfoGroup[i]);
                     break;
+                case InputObject:
+                    methodParamObject[i] = paramDataToInputObject((InvokeBeanObject) invokeObjectInfoGroup[i]);
+                    break;
                 case Unmatched:
                 default:
                     methodParamObject[i] = null;
@@ -158,6 +161,13 @@ public class RequestMappingHandler {
         return null;
     }
 
+    private Object paramDataToInputObject(InvokeBeanObject invokeBeanObject) {
+        if (invokeBeanObject.getBeanName() !=  null) {
+            return applicationContext.getBean(invokeBeanObject.getBeanName());
+        } else {
+            return applicationContext.getBean(invokeBeanObject.getArgClass());
+        }
+    }
 
 
 }

@@ -9,13 +9,16 @@ import com.mh.controltool2.scan.PackageProcessHandler;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HandlerConfig implements PackageProcessHandler {
 
     private static final String TAG = "HandlerConfig";
 
     private List<MappedInterceptor> mappedInterceptorList = new ArrayList<>();
+    private Map<String,Object> beanMap = new HashMap<>();
 
     @Override
     public void loadFullPackageData(List<Class<?>> classList) {
@@ -52,6 +55,7 @@ public class HandlerConfig implements PackageProcessHandler {
 
                 LoadConfigurer loadConfigurer = new LoadConfigurer(configurer);
                 mappedInterceptorList = loadConfigurer.getMappedInterceptorList();
+                beanMap = loadConfigurer.getBeanMap();
 
                 return;
             } catch (InstantiationException e) {
@@ -68,10 +72,15 @@ public class HandlerConfig implements PackageProcessHandler {
         return mappedInterceptorList;
     }
 
+    public Map<String, Object> getBeanMap() {
+        return beanMap;
+    }
+
     @Override
     public String toString() {
         return "HandlerConfig{" +
                 "mappedInterceptorList=" + mappedInterceptorList +
+                ", beanMap=" + beanMap +
                 '}';
     }
 }

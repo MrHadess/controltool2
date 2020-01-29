@@ -1,6 +1,7 @@
 package com.mh.controltool2;
 
 import com.mh.controltool2.scan.CenterPackageProcessHandler;
+import com.mh.controltool2.scan.annotation.HandlerBean;
 import com.mh.controltool2.scan.annotation.HandlerConfig;
 import com.mh.controltool2.scan.annotation.HandlerControl;
 
@@ -12,6 +13,7 @@ public class Config {
 
     private CenterPackageProcessHandler centerPackageProcessHandler;
 
+    private HandlerBean handlerBean = new HandlerBean();
     private HandlerControl handlerControl = new HandlerControl();
     private HandlerConfig handlerConfig = new HandlerConfig();
 
@@ -36,6 +38,7 @@ public class Config {
         centerPackageProcessHandler = new CenterPackageProcessHandler(scanPackages);
         centerPackageProcessHandler.addPackagesScan(handlerControl);
         centerPackageProcessHandler.addPackagesScan(handlerConfig);
+        centerPackageProcessHandler.addPackagesScan(handlerBean);
 
         centerPackageProcessHandler.startProcessHandler();
 
@@ -59,4 +62,7 @@ public class Config {
         return handlerConfig;
     }
 
+    public HandlerBean getHandlerBean() {
+        return handlerBean;
+    }
 }

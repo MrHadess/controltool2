@@ -1,5 +1,6 @@
 package com.mh.controltool2.config.annotation;
 
+import com.mh.controltool2.config.BeanRegistry;
 import com.mh.controltool2.config.InterceptorRegistry;
 
 public interface Configurer2 {
@@ -29,6 +30,8 @@ public interface Configurer2 {
 
     // HandlerInterceptor
     default void addInterceptors(InterceptorRegistry registry) { }
+
+    default void registerBean(BeanRegistry beanRegistry) {}
 
 
 }
