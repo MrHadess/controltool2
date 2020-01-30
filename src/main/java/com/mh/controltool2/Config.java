@@ -11,7 +11,10 @@ import java.util.List;
 
 public class Config {
 
+    private static final String DEFAULT_BEAN_PROPERTIES_FILE_NAME = "controltool.properties";
+
     private CenterPackageProcessHandler centerPackageProcessHandler;
+    private String beanPropertiesFileName;
 
     private HandlerBean handlerBean = new HandlerBean();
     private HandlerControl handlerControl = new HandlerControl();
@@ -27,6 +30,11 @@ public class Config {
     * */
 
     private Config(ServletConfig servletConfig) {
+        beanPropertiesFileName = servletConfig.getInitParameter("BeanProperties");
+        if (beanPropertiesFileName == null) {
+            beanPropertiesFileName = DEFAULT_BEAN_PROPERTIES_FILE_NAME;
+        }
+
         String needScanPackages = servletConfig.getInitParameter("ScanPkg");
         String[] packages = needScanPackages.split(";");
         List<String> scanPackages = new ArrayList<String>();
@@ -52,6 +60,10 @@ public class Config {
 
     protected static Config create(ServletConfig servletConfig) {
         return new Config(servletConfig);
+    }
+
+    public String getBeanPropertiesFileName() {
+        return beanPropertiesFileName;
     }
 
     public HandlerControl getHandlerControl() {

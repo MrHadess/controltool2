@@ -31,7 +31,7 @@ public class BeanRegistry {
     }
 
     public void registerBean(String beanName, Object obj) throws BeanFactoryException {
-        Assert.notNull(beanName,"Bean name must not be null");
+        Assert.notNull(beanName,"Bean value must not be null");
         Assert.notNull(obj,"Object must not be null");
         synchronized (this.beanMap) {
             if (beanMap.containsKey(beanName)) {

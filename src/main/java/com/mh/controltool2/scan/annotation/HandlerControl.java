@@ -120,7 +120,7 @@ public class HandlerControl implements PackageProcessHandler {
                 printErrLog(matchClass,method,message);
             }
 
-            LogOut.e(TAG,String.format("%s.%s--Handler mapping to url:'%s'",matchClass.getName(),method.getName(),matchURl));
+            LogOut.i(TAG,String.format("%s.%s--Handler mapping to url:'%s'",matchClass.getName(),method.getName(),matchURl));
 
         }
 

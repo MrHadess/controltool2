@@ -26,10 +26,10 @@ public class HandlerBean implements PackageProcessHandler {
                 continue;
             }
 
-            if ("".equals(beanAnnotation.name())) {
+            if ("".equals(beanAnnotation.value())) {
                 scanBeanMap.put(item.getName(),item);
             } else {
-                scanBeanMap.put(beanAnnotation.name(),item);
+                scanBeanMap.put(beanAnnotation.value(),item);
             }
         }
 

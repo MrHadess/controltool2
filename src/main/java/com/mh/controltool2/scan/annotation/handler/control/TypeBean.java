@@ -20,8 +20,8 @@ public class TypeBean implements AnnotationTypeHandler {
         if (bean == null) return null;
 
         InvokeBeanObject invokeBeanObject = new InvokeBeanObject();
-        if("".equals(bean.name())) {
-            invokeBeanObject.setBeanName(bean.name());
+        if("".equals(bean.value())) {
+            invokeBeanObject.setBeanName(bean.value());
         }
         invokeBeanObject.setArgToClass(parameter.getType());
         return invokeBeanObject;

@@ -3,13 +3,14 @@ package com.mh.controltool2.context;
 import com.mh.controltool2.ApplicationContext;
 import com.mh.controltool2.annotation.Autowired;
 import com.mh.controltool2.annotation.Bean;
+import com.mh.controltool2.annotation.Value;
 import com.mh.controltool2.exceptions.BeanFactoryException;
 import com.mh.controltool2.exceptions.invoke.BeanInstantiationException;
 import com.mh.controltool2.util.Assert;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.TypeVariable;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +86,7 @@ public class FullApplicationContext implements ApplicationContext {
 
     @Override
     public void addBean(String name, Object obj) throws BeanFactoryException {
-        Assert.notNull(name,"Bean name must not be null");
+        Assert.notNull(name,"Bean value must not be null");
         Assert.notNull(obj,"Object must not be null");
         synchronized (this.objectMap) {
             if (objectMap.containsKey(name)) {
@@ -119,7 +120,7 @@ public class FullApplicationContext implements ApplicationContext {
         if (!tClass.isAssignableFrom(tClassImpl)) {
             throw new BeanFactoryException(
                     BeanFactoryException.ExpType.NotAssignableFromClass,
-                    String.format("Target class:'%s',class impl name:'%s'",tClass.getName(),tClassImpl.getName())
+                    String.format("Target class:'%s',class impl value:'%s'",tClass.getName(),tClassImpl.getName())
             );
         }
         return tClass.cast(createObj(tClass.getName(),tClassImpl));
@@ -168,7 +169,7 @@ public class FullApplicationContext implements ApplicationContext {
         // Next try create has 'autowired' annotation constructors (Is random mode)
         Object[] paramTypeObject;
         for (Constructor item:supportAutowiredConstructorList) {
-            // If 'autowired' annotation has bean name ,first use it to bean name
+            // If 'autowired' annotation has bean value ,first use it to bean value
             try {
                 paramTypeObject = loadParamObjects(item);
             } catch (BeanFactoryException e) {
@@ -203,7 +204,7 @@ public class FullApplicationContext implements ApplicationContext {
     }
 
     private Object[] loadParamObjects(Constructor constructor) throws BeanFactoryException {
-        TypeVariable[] itemTypeParameters = constructor.getTypeParameters();
+        Parameter[] itemTypeParameters = constructor.getParameters();
         Class<?>[] itemParameterTypes = constructor.getParameterTypes();
         Object[] paramTypeObject = new Object[itemParameterTypes.length];
         for (int index = 0;index < itemParameterTypes.length;index++) {
@@ -222,9 +223,19 @@ public class FullApplicationContext implements ApplicationContext {
             }
 
             Bean beanAnnotation = itemTypeParameters[index].getAnnotation(Bean.class);
-            if (beanAnnotation != null && "".equals(beanAnnotation.name())) {
+            if (beanAnnotation != null) {
+                if ("".equals(beanAnnotation.value())) {
+                    paramTypeObject[index] = tryGetBean(beanAnnotation.value(),itemParameterTypes[index]);
+                } else {
+                    paramTypeObject[index] = tryGetBean(itemParameterTypes[index].getName(),itemParameterTypes[index]);
+                }
+                continue;
+            }
+
+            Value valueAnnotation = itemTypeParameters[index].getAnnotation(Value.class);
+            if (valueAnnotation != null && !"".equals(valueAnnotation.value())) {
                 // input null
-                paramTypeObject[index] = tryGetBean(beanAnnotation.name(),itemParameterTypes[index]);
+                paramTypeObject[index] = getBean(ConfigReader.class).readValue(valueAnnotation.value(),itemParameterTypes[index]);
                 continue;
             }
 
