@@ -6,14 +6,13 @@ import com.mh.controltool2.Config;
 import com.mh.controltool2.dto.HandlerErrorInfo;
 import com.mh.controltool2.exceptions.invoke.BeanInstantiationException;
 import com.mh.controltool2.exceptions.invoke.HandlerThrowException;
+import com.mh.controltool2.handler.messagerewrite.HttpMessageRewrite;
 import com.mh.controltool2.handler.pojo.RequestMatchInfo;
 import com.mh.controltool2.serialize.json.DataObjectSerialize;
-import com.mh.controltool2.serialize.json.DefaultDataObjectSerialize;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 
 
@@ -25,10 +24,9 @@ import java.lang.reflect.InvocationTargetException;
 * */
 public class DispatcherServlet {
 
-    private static final String CONTENT_TYPE_APPLICATION_JSON_UTF_8 = "application/json;utf-8";
-
     private ApplicationContext applicationContext;
     private DataObjectSerialize dataObjectSerialize;
+    private HttpMessageRewrite httpMessageRewrite;
 
     private RequestInterceptorHandler requestInterceptorHandler;
     private RequestMappingHandler requestMappingHandler;
@@ -36,7 +34,8 @@ public class DispatcherServlet {
     // init assembly
     public void init(Config config, ApplicationContext applicationContext) throws BeanInstantiationException {
         this.applicationContext = applicationContext;
-        dataObjectSerialize = applicationContext.tryGetBean(DefaultDataObjectSerialize.class);
+        dataObjectSerialize = applicationContext.getBean(DataObjectSerialize.class);
+        httpMessageRewrite = applicationContext.getBean(HttpMessageRewrite.class);
         // bean group (Unrealized)
         // handler interceptor (Unrealized)
         requestInterceptorHandler = new RequestInterceptorHandler(config.getHandlerConfig().getMappedInterceptorList());
@@ -65,7 +64,7 @@ public class DispatcherServlet {
 
         if (requestMatchInfo == null || requestMatchInfo.getMethodInvokeInfo() == null) {
             response.setStatus(404);
-            rewriteToClient(response,"404 The origin server did not find a current representation for the target resource (ControlTool)");
+            httpMessageRewrite.responseRewriteMessage(response,"404 The origin server did not find a current representation for the target resource (ControlTool)");
             return;
         }
 
@@ -111,22 +110,15 @@ public class DispatcherServlet {
 
 
         if (reqReturnObject != null) {
-            rewriteToClient(response, dataObjectSerialize.toJson(reqReturnObject));
+            httpMessageRewrite.responseRewriteMessage(response, dataObjectSerialize.toJson(reqReturnObject));
         }
     }
 
-    private void rewriteToClient(HttpServletResponse response,String data) throws IOException {
-        PrintWriter respWriter = response.getWriter();
-        respWriter.print(data);
-        respWriter.flush();
-    }
-
     private void rewriteExceptionToClient(HttpServletResponse response,String msg,Throwable e) throws IOException {
-        response.setContentType(CONTENT_TYPE_APPLICATION_JSON_UTF_8);
         HandlerErrorInfo handlerErrorInfo = new HandlerErrorInfo();
         handlerErrorInfo.setMessage(msg);
         handlerErrorInfo.setThrowableStack(e);
-        rewriteToClient(response, dataObjectSerialize.toJson(handlerErrorInfo));
+        httpMessageRewrite.responseRewriteMessage(response,handlerErrorInfo);
     }
 
 

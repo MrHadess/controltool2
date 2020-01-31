@@ -5,7 +5,9 @@ import com.mh.controltool2.annotation.Configuration;
 import com.mh.controltool2.config.LoadConfigurer;
 import com.mh.controltool2.config.MappedInterceptor;
 import com.mh.controltool2.config.annotation.Configurer2;
+import com.mh.controltool2.handler.messagerewrite.HttpMessageRewrite;
 import com.mh.controltool2.scan.PackageProcessHandler;
+import com.mh.controltool2.serialize.json.DataObjectSerialize;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -19,6 +21,8 @@ public class HandlerConfig implements PackageProcessHandler {
 
     private List<MappedInterceptor> mappedInterceptorList = new ArrayList<>();
     private Map<String,Object> beanMap = new HashMap<>();
+    private DataObjectSerialize dataObjectSerialize;
+    private HttpMessageRewrite httpMessageRewrite;
 
     @Override
     public void loadFullPackageData(List<Class<?>> classList) {
@@ -56,6 +60,8 @@ public class HandlerConfig implements PackageProcessHandler {
                 LoadConfigurer loadConfigurer = new LoadConfigurer(configurer);
                 mappedInterceptorList = loadConfigurer.getMappedInterceptorList();
                 beanMap = loadConfigurer.getBeanMap();
+                dataObjectSerialize = loadConfigurer.getDataObjectSerialize();
+                httpMessageRewrite = loadConfigurer.getHttpMessageRewrite();
 
                 return;
             } catch (InstantiationException e) {
@@ -76,11 +82,21 @@ public class HandlerConfig implements PackageProcessHandler {
         return beanMap;
     }
 
+    public DataObjectSerialize getDataObjectSerialize() {
+        return dataObjectSerialize;
+    }
+
+    public HttpMessageRewrite getHttpMessageRewrite() {
+        return httpMessageRewrite;
+    }
+
     @Override
     public String toString() {
         return "HandlerConfig{" +
                 "mappedInterceptorList=" + mappedInterceptorList +
                 ", beanMap=" + beanMap +
+                ", dataObjectSerialize=" + dataObjectSerialize +
+                ", httpMessageRewrite=" + httpMessageRewrite +
                 '}';
     }
 }

@@ -2,6 +2,10 @@ package com.mh.controltool2.config.annotation;
 
 import com.mh.controltool2.config.BeanRegistry;
 import com.mh.controltool2.config.InterceptorRegistry;
+import com.mh.controltool2.handler.messagerewrite.HttpMessageRewrite;
+import com.mh.controltool2.handler.messagerewrite.JsonDefaultHttpMessageRewrite;
+import com.mh.controltool2.serialize.json.DataObjectSerialize;
+import com.mh.controltool2.serialize.json.DefaultDataObjectSerialize;
 
 public interface Configurer2 {
 
@@ -32,6 +36,14 @@ public interface Configurer2 {
     default void addInterceptors(InterceptorRegistry registry) { }
 
     default void registerBean(BeanRegistry beanRegistry) {}
+
+    default DataObjectSerialize registerDataObjectSerialize() {
+        return new DefaultDataObjectSerialize();
+    }
+
+    default HttpMessageRewrite registerHttpMessageRewrite(DataObjectSerialize dataObjectSerialize) {
+        return new JsonDefaultHttpMessageRewrite(dataObjectSerialize);
+    }
 
 
 }

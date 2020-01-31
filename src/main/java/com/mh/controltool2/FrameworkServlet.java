@@ -5,6 +5,8 @@ import com.mh.controltool2.context.ConfigReader;
 import com.mh.controltool2.context.ConfigReaderToFramework;
 import com.mh.controltool2.context.FullApplicationContext;
 import com.mh.controltool2.handler.DispatcherServlet;
+import com.mh.controltool2.handler.messagerewrite.HttpMessageRewrite;
+import com.mh.controltool2.serialize.json.DataObjectSerialize;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -31,6 +33,9 @@ public class FrameworkServlet extends HttpServlet {
         LogOut.i("FrameworkServlet initiation");
 
         config = Config.create(servletConfig);
+        // load default assembly
+        applicationContext.addBean(DataObjectSerialize.class,config.getHandlerConfig().getDataObjectSerialize());
+        applicationContext.addBean(HttpMessageRewrite.class,config.getHandlerConfig().getHttpMessageRewrite());
         // create config reader bean
         applicationContext.addBean(
                 ConfigReader.class,
