@@ -5,7 +5,8 @@ import com.mh.controltool2.context.ConfigReader;
 import com.mh.controltool2.context.ConfigReaderToFramework;
 import com.mh.controltool2.context.FullApplicationContext;
 import com.mh.controltool2.handler.DispatcherServlet;
-import com.mh.controltool2.handler.messagerewrite.HttpMessageRewrite;
+import com.mh.controltool2.handler.message.ExceptionHandler;
+import com.mh.controltool2.handler.message.HttpMessageRewrite;
 import com.mh.controltool2.serialize.json.DataObjectSerialize;
 
 import javax.servlet.ServletConfig;
@@ -41,6 +42,8 @@ public class FrameworkServlet extends HttpServlet {
                 ConfigReader.class,
                 new ConfigReaderToFramework(config.getBeanPropertiesFileName())
         );
+        // load exception handler bean
+        applicationContext.addBean(ExceptionHandler.class,config.getHandlerConfig().getExceptionHandler());
         // load bean from config
         BeanUtil.tryBeanMapToContext(applicationContext,config.getHandlerConfig().getBeanMap());
         // load full bean

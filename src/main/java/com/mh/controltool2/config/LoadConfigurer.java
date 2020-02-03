@@ -1,7 +1,8 @@
 package com.mh.controltool2.config;
 
 import com.mh.controltool2.config.annotation.Configurer2;
-import com.mh.controltool2.handler.messagerewrite.HttpMessageRewrite;
+import com.mh.controltool2.handler.message.ExceptionHandler;
+import com.mh.controltool2.handler.message.HttpMessageRewrite;
 import com.mh.controltool2.serialize.json.DataObjectSerialize;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ public class LoadConfigurer {
     private Map<String,Object> beanMap;
     private DataObjectSerialize dataObjectSerialize;
     private HttpMessageRewrite httpMessageRewrite;
+    private ExceptionHandler exceptionHandler;
 
     public LoadConfigurer(Configurer2 configurer) {
         // load interceptor
@@ -33,6 +35,8 @@ public class LoadConfigurer {
         dataObjectSerialize = configurer.registerDataObjectSerialize();
         // load HttpMessageRewrite
         httpMessageRewrite = configurer.registerHttpMessageRewrite(dataObjectSerialize);
+        // load ExceptionHandler
+        exceptionHandler = configurer.registerExceptionHandler();
     }
 
     public List<MappedInterceptor> getMappedInterceptorList() {
@@ -51,6 +55,10 @@ public class LoadConfigurer {
         return httpMessageRewrite;
     }
 
+    public ExceptionHandler getExceptionHandler() {
+        return exceptionHandler;
+    }
+
     @Override
     public String toString() {
         return "LoadConfigurer{" +
@@ -58,6 +66,7 @@ public class LoadConfigurer {
                 ", beanMap=" + beanMap +
                 ", dataObjectSerialize=" + dataObjectSerialize +
                 ", httpMessageRewrite=" + httpMessageRewrite +
+                ", exceptionHandler=" + exceptionHandler +
                 '}';
     }
 }

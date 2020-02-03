@@ -40,7 +40,7 @@ public class RequestInterceptorHandler {
                 );
                 if (!handlerAccept) return false;
             } catch (Exception e) {
-                throw new HandlerThrowException(e);
+                throw new HandlerThrowException("Interceptor handler throw exception",e);
             }
 
             handlerInterceptorStack.push(handlerInterceptor);
@@ -66,7 +66,7 @@ public class RequestInterceptorHandler {
                         handlerException
                 );
             } catch (Exception e) {
-                throw new HandlerThrowException(e);
+                throw new HandlerThrowException("Interceptor throw exception",e);
             }
         }
     }

@@ -5,7 +5,8 @@ import com.mh.controltool2.annotation.Configuration;
 import com.mh.controltool2.config.LoadConfigurer;
 import com.mh.controltool2.config.MappedInterceptor;
 import com.mh.controltool2.config.annotation.Configurer2;
-import com.mh.controltool2.handler.messagerewrite.HttpMessageRewrite;
+import com.mh.controltool2.handler.message.ExceptionHandler;
+import com.mh.controltool2.handler.message.HttpMessageRewrite;
 import com.mh.controltool2.scan.PackageProcessHandler;
 import com.mh.controltool2.serialize.json.DataObjectSerialize;
 
@@ -23,6 +24,7 @@ public class HandlerConfig implements PackageProcessHandler {
     private Map<String,Object> beanMap = new HashMap<>();
     private DataObjectSerialize dataObjectSerialize;
     private HttpMessageRewrite httpMessageRewrite;
+    private ExceptionHandler exceptionHandler;
 
     @Override
     public void loadFullPackageData(List<Class<?>> classList) {
@@ -62,6 +64,7 @@ public class HandlerConfig implements PackageProcessHandler {
                 beanMap = loadConfigurer.getBeanMap();
                 dataObjectSerialize = loadConfigurer.getDataObjectSerialize();
                 httpMessageRewrite = loadConfigurer.getHttpMessageRewrite();
+                exceptionHandler = loadConfigurer.getExceptionHandler();
 
                 return;
             } catch (InstantiationException e) {
@@ -90,6 +93,10 @@ public class HandlerConfig implements PackageProcessHandler {
         return httpMessageRewrite;
     }
 
+    public ExceptionHandler getExceptionHandler() {
+        return exceptionHandler;
+    }
+
     @Override
     public String toString() {
         return "HandlerConfig{" +
@@ -97,6 +104,7 @@ public class HandlerConfig implements PackageProcessHandler {
                 ", beanMap=" + beanMap +
                 ", dataObjectSerialize=" + dataObjectSerialize +
                 ", httpMessageRewrite=" + httpMessageRewrite +
+                ", exceptionHandler=" + exceptionHandler +
                 '}';
     }
 }

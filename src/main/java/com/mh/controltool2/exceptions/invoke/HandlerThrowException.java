@@ -6,8 +6,4 @@ public class HandlerThrowException extends RuntimeException {
         super(message, cause);
     }
 
-    public HandlerThrowException(Throwable cause) {
-        super(cause);
-    }
-
 }

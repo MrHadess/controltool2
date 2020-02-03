@@ -1,4 +1,4 @@
-package com.mh.controltool2.handler.messagerewrite;
+package com.mh.controltool2.handler.message;
 
 import com.mh.controltool2.annotation.Autowired;
 import com.mh.controltool2.serialize.json.DataObjectSerialize;
