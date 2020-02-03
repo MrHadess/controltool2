@@ -1,13 +1,9 @@
 package com.mh.controltool2;
 
+import com.mh.controltool2.context.AssemblyBeanLoader;
 import com.mh.controltool2.context.BeanUtil;
-import com.mh.controltool2.context.ConfigReader;
-import com.mh.controltool2.context.ConfigReaderToFramework;
 import com.mh.controltool2.context.FullApplicationContext;
 import com.mh.controltool2.handler.DispatcherServlet;
-import com.mh.controltool2.handler.message.ExceptionHandler;
-import com.mh.controltool2.handler.message.HttpMessageRewrite;
-import com.mh.controltool2.serialize.json.DataObjectSerialize;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -35,15 +31,7 @@ public class FrameworkServlet extends HttpServlet {
 
         config = Config.create(servletConfig);
         // load default assembly
-        applicationContext.addBean(DataObjectSerialize.class,config.getHandlerConfig().getDataObjectSerialize());
-        applicationContext.addBean(HttpMessageRewrite.class,config.getHandlerConfig().getHttpMessageRewrite());
-        // create config reader bean
-        applicationContext.addBean(
-                ConfigReader.class,
-                new ConfigReaderToFramework(config.getBeanPropertiesFileName())
-        );
-        // load exception handler bean
-        applicationContext.addBean(ExceptionHandler.class,config.getHandlerConfig().getExceptionHandler());
+        AssemblyBeanLoader.loadConfigToContext(applicationContext,config);
         // load bean from config
         BeanUtil.tryBeanMapToContext(applicationContext,config.getHandlerConfig().getBeanMap());
         // load full bean
