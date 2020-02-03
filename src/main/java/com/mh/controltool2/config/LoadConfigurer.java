@@ -11,13 +11,13 @@ import java.util.Map;
 
 public class LoadConfigurer {
 
-    private List<MappedInterceptor> mappedInterceptorList;
-    private Map<String,Object> beanMap;
-    private DataObjectSerialize dataObjectSerialize;
-    private HttpMessageRewrite httpMessageRewrite;
-    private ExceptionHandler exceptionHandler;
+    protected List<MappedInterceptor> mappedInterceptorList;
+    protected Map<String,Object> beanMap;
+    protected DataObjectSerialize dataObjectSerialize;
+    protected HttpMessageRewrite httpMessageRewrite;
+    protected ExceptionHandler exceptionHandler;
 
-    public LoadConfigurer(Configurer2 configurer) {
+    public void load(Configurer2 configurer) {
         // load interceptor
         InterceptorRegistry interceptorRegistry = new InterceptorRegistry();
         configurer.addInterceptors(interceptorRegistry);

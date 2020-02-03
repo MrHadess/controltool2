@@ -3,28 +3,16 @@ package com.mh.controltool2.scan.annotation;
 import com.mh.controltool2.LogOut;
 import com.mh.controltool2.annotation.Configuration;
 import com.mh.controltool2.config.LoadConfigurer;
-import com.mh.controltool2.config.MappedInterceptor;
 import com.mh.controltool2.config.annotation.Configurer2;
-import com.mh.controltool2.handler.message.ExceptionHandler;
-import com.mh.controltool2.handler.message.HttpMessageRewrite;
 import com.mh.controltool2.scan.PackageProcessHandler;
-import com.mh.controltool2.serialize.json.DataObjectSerialize;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class HandlerConfig implements PackageProcessHandler {
+
+public class HandlerConfig extends  LoadConfigurer implements PackageProcessHandler {
 
     private static final String TAG = "HandlerConfig";
-
-    private List<MappedInterceptor> mappedInterceptorList = new ArrayList<>();
-    private Map<String,Object> beanMap = new HashMap<>();
-    private DataObjectSerialize dataObjectSerialize;
-    private HttpMessageRewrite httpMessageRewrite;
-    private ExceptionHandler exceptionHandler;
 
     @Override
     public void loadFullPackageData(List<Class<?>> classList) {
@@ -58,14 +46,7 @@ public class HandlerConfig implements PackageProcessHandler {
 
             try {
                 Configurer2 configurer = (Configurer2) item.newInstance();
-
-                LoadConfigurer loadConfigurer = new LoadConfigurer(configurer);
-                mappedInterceptorList = loadConfigurer.getMappedInterceptorList();
-                beanMap = loadConfigurer.getBeanMap();
-                dataObjectSerialize = loadConfigurer.getDataObjectSerialize();
-                httpMessageRewrite = loadConfigurer.getHttpMessageRewrite();
-                exceptionHandler = loadConfigurer.getExceptionHandler();
-
+                load(configurer);
                 return;
             } catch (InstantiationException e) {
                 e.getCause().printStackTrace();
@@ -75,26 +56,6 @@ public class HandlerConfig implements PackageProcessHandler {
         }
 
 
-    }
-
-    public List<MappedInterceptor> getMappedInterceptorList() {
-        return mappedInterceptorList;
-    }
-
-    public Map<String, Object> getBeanMap() {
-        return beanMap;
-    }
-
-    public DataObjectSerialize getDataObjectSerialize() {
-        return dataObjectSerialize;
-    }
-
-    public HttpMessageRewrite getHttpMessageRewrite() {
-        return httpMessageRewrite;
-    }
-
-    public ExceptionHandler getExceptionHandler() {
-        return exceptionHandler;
     }
 
     @Override

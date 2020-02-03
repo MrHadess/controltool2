@@ -77,7 +77,6 @@ public class DispatcherServlet {
             if (!interceptorPreHandlerState) return;// cut next handler
         } catch (HandlerThrowException e) {
             e.getCause().printStackTrace();
-//            rewriteExceptionToClient(response,"Interceptor handler throw exception",e.getCause());
             Object returnMessage = exceptionHandler.resolveException(request,response,e);
             if (returnMessage != null) {
                 httpMessageRewrite.responseRewriteMessage(response,returnMessage);
@@ -109,7 +108,6 @@ public class DispatcherServlet {
             if (returnMessage != null) {
                 httpMessageRewrite.responseRewriteMessage(response,returnMessage);
             }
-//            rewriteExceptionToClient(response,"Control throw exception",e.getCause());
             return;
         }
 
@@ -122,7 +120,6 @@ public class DispatcherServlet {
             if (returnMessage != null) {
                 httpMessageRewrite.responseRewriteMessage(response,returnMessage);
             }
-//            rewriteExceptionToClient(response,"Interceptor throw exception",e.getCause());
             return;
         }
 
