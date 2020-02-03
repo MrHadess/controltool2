@@ -54,34 +54,35 @@ public class DispatcherServlet {
         RequestContextHolder.update(request,response);
 
         try {
-            startHandlerLine(request,response);
+            Object handlerReturnObject = startHandlerLine(request,response);
+            if (handlerReturnObject != null) {
+                httpMessageRewrite.responseRewriteMessage(response, dataObjectSerialize.toJson(handlerReturnObject));
+            }
         } finally {
             RequestContextHolder.remove();
         }
 
     }
 
-    private void startHandlerLine(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private Object startHandlerLine(HttpServletRequest request, HttpServletResponse response) throws IOException {
         RequestMatchInfo requestMatchInfo = requestMappingHandler.requestMatchMethodInvokeInfo();
 
         if (requestMatchInfo == null || requestMatchInfo.getMethodInvokeInfo() == null) {
             response.setStatus(404);
             httpMessageRewrite.responseRewriteMessage(response,"404 The origin server did not find a current representation for the target resource (ControlTool)");
-            return;
+            return null;
         }
 
         // try handler interceptor
         try {
             requestInterceptorHandler.cleanInterceptorStack();
             boolean interceptorPreHandlerState = requestInterceptorHandler.request(requestMatchInfo.getMethodInvokeInfo().getTargetMethod());
-            if (!interceptorPreHandlerState) return;// cut next handler
+            if (!interceptorPreHandlerState) {
+                return null;// cut next handler
+            }
         } catch (HandlerThrowException e) {
             e.getCause().printStackTrace();
-            Object returnMessage = exceptionHandler.resolveException(request,response,e);
-            if (returnMessage != null) {
-                httpMessageRewrite.responseRewriteMessage(response,returnMessage);
-            }
-            return;
+            return exceptionHandler.resolveException(request,response,e);
         }
 
         Object reqReturnObject = null;
@@ -90,11 +91,7 @@ public class DispatcherServlet {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
 //            rewriteExceptionToClient(response,"Method access fail",e);
-            Object returnMessage = exceptionHandler.resolveException(request,response,e);
-            if (returnMessage != null) {
-                httpMessageRewrite.responseRewriteMessage(response,returnMessage);
-            }
-            return;
+            return exceptionHandler.resolveException(request,response,e);
         } catch (InvocationTargetException e) {
             // use to 'handler interceptor'
             e.getCause().printStackTrace();
@@ -104,11 +101,7 @@ public class DispatcherServlet {
             } catch (HandlerThrowException requestInterceptorHandlerEx) {
                 e.getCause().addSuppressed(requestInterceptorHandlerEx.getCause());
             }
-            Object returnMessage = exceptionHandler.resolveException(request,response,new HandlerThrowException("Control throw exception",e.getCause()));
-            if (returnMessage != null) {
-                httpMessageRewrite.responseRewriteMessage(response,returnMessage);
-            }
-            return;
+            return exceptionHandler.resolveException(request,response,new HandlerThrowException("Control throw exception",e.getCause()));
         }
 
         try {
@@ -116,17 +109,10 @@ public class DispatcherServlet {
         } catch (HandlerThrowException e) {
             // use to 'handler interceptor'
             e.getCause().printStackTrace();
-            Object returnMessage = exceptionHandler.resolveException(request,response,new HandlerThrowException("Control throw exception",e));
-            if (returnMessage != null) {
-                httpMessageRewrite.responseRewriteMessage(response,returnMessage);
-            }
-            return;
+            return exceptionHandler.resolveException(request,response,new HandlerThrowException("Control throw exception",e));
         }
 
-
-        if (reqReturnObject != null) {
-            httpMessageRewrite.responseRewriteMessage(response, dataObjectSerialize.toJson(reqReturnObject));
-        }
+        return reqReturnObject;
     }
 
 
