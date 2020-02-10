@@ -1,6 +1,7 @@
 package com.mh.controltool2.handler;
 
 import com.mh.controltool2.ApplicationContext;
+import com.mh.controltool2.context.ConfigReader;
 import com.mh.controltool2.exceptions.invoke.BeanInstantiationException;
 import com.mh.controltool2.exceptions.invoke.ParamDataIsEmptyException;
 import com.mh.controltool2.exceptions.invoke.UnsupportedSerializeObjectException;
@@ -32,6 +33,7 @@ public class RequestMappingHandler {
     private HashMap<Pattern,URLInvokeTree> urlFuzzyMap;
 
     private DataObjectSerialize dataObjectSerialize;
+    private ConfigReader configReader;
 
     public RequestMappingHandler(
             ApplicationContext applicationContext,
@@ -43,6 +45,7 @@ public class RequestMappingHandler {
         this.urlFuzzyMap = urlFuzzyMap;
 
         dataObjectSerialize = applicationContext.tryGetBean(DefaultDataObjectSerialize.class);
+        configReader = applicationContext.getBean(ConfigReader.class);
     }
 
     protected RequestMatchInfo requestMatchMethodInvokeInfo() {
@@ -107,6 +110,9 @@ public class RequestMappingHandler {
                 case InputObject:
                     methodParamObject[i] = paramDataToInputObject((InvokeBeanObject) invokeObjectInfoGroup[i]);
                     break;
+                case ConfigValue:
+                    methodParamObject[i] = paramDataToConfigValue((InvokeConfigValue) invokeObjectInfoGroup[i]);
+                    break;
                 case Unmatched:
                 default:
                     methodParamObject[i] = null;
@@ -161,6 +167,13 @@ public class RequestMappingHandler {
         }
 
         return null;
+    }
+
+    private Object paramDataToConfigValue(InvokeConfigValue invokeConfigValue) {
+        return configReader.readValue(
+                invokeConfigValue.getKey(),
+                invokeConfigValue.getArgClass()
+        );
     }
 
     private Object paramDataToInputObject(InvokeBeanObject invokeBeanObject) {
