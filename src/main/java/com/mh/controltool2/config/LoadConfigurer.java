@@ -1,21 +1,26 @@
 package com.mh.controltool2.config;
 
 import com.mh.controltool2.config.annotation.Configurer2;
+import com.mh.controltool2.handler.message.DefaultExceptionHandler;
 import com.mh.controltool2.handler.message.ExceptionHandler;
 import com.mh.controltool2.handler.message.HttpMessageRewrite;
+import com.mh.controltool2.handler.message.JsonDefaultHttpMessageRewrite;
 import com.mh.controltool2.serialize.json.DataObjectSerialize;
+import com.mh.controltool2.serialize.json.DefaultDataObjectSerialize;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class LoadConfigurer {
 
-    protected List<MappedInterceptor> mappedInterceptorList;
-    protected Map<String,Object> beanMap;
-    protected DataObjectSerialize dataObjectSerialize;
-    protected HttpMessageRewrite httpMessageRewrite;
-    protected ExceptionHandler exceptionHandler;
+    // Must be not null object
+    protected List<MappedInterceptor> mappedInterceptorList = new ArrayList<>();
+    protected Map<String,Object> beanMap = new HashMap<>();
+    protected DataObjectSerialize dataObjectSerialize = new DefaultDataObjectSerialize();
+    protected HttpMessageRewrite httpMessageRewrite = new JsonDefaultHttpMessageRewrite(dataObjectSerialize);
+    protected ExceptionHandler exceptionHandler = new DefaultExceptionHandler();
 
     public void load(Configurer2 configurer) {
         // load interceptor
@@ -32,11 +37,20 @@ public class LoadConfigurer {
         this.beanMap = beanRegistry.getBeanMap();
 
         // load DataObjectSerialize
-        dataObjectSerialize = configurer.registerDataObjectSerialize();
+        DataObjectSerialize tempDataObjectSerialize = configurer.registerDataObjectSerialize();
+        if (tempDataObjectSerialize != null) {
+            dataObjectSerialize = tempDataObjectSerialize;
+        }
         // load HttpMessageRewrite
-        httpMessageRewrite = configurer.registerHttpMessageRewrite(dataObjectSerialize);
+        HttpMessageRewrite tempHttpMessageRewrite = configurer.registerHttpMessageRewrite(dataObjectSerialize);
+        if (tempHttpMessageRewrite != null) {
+            httpMessageRewrite = tempHttpMessageRewrite;
+        }
         // load ExceptionHandler
-        exceptionHandler = configurer.registerExceptionHandler();
+        ExceptionHandler tempExceptionHandler = configurer.registerExceptionHandler();
+        if (tempDataObjectSerialize != null) {
+            exceptionHandler = tempExceptionHandler;
+        }
     }
 
     public List<MappedInterceptor> getMappedInterceptorList() {
