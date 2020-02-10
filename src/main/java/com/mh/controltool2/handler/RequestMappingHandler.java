@@ -4,6 +4,7 @@ import com.mh.controltool2.ApplicationContext;
 import com.mh.controltool2.exceptions.invoke.BeanInstantiationException;
 import com.mh.controltool2.exceptions.invoke.ParamDataIsEmptyException;
 import com.mh.controltool2.exceptions.invoke.UnsupportedSerializeObjectException;
+import com.mh.controltool2.exceptions.serialize.JsonHandlerException;
 import com.mh.controltool2.handler.pojo.RequestMatchInfo;
 import com.mh.controltool2.method.MethodInvokeInfo;
 import com.mh.controltool2.method.URLInvokeTree;
@@ -73,7 +74,8 @@ public class RequestMappingHandler {
         return null;
     }
 
-    protected Object request(RequestMatchInfo requestMatchInfo) throws IOException, InvocationTargetException, IllegalAccessException  {
+    protected Object request(RequestMatchInfo requestMatchInfo)
+            throws IOException, InvocationTargetException, IllegalAccessException, JsonHandlerException, UnsupportedSerializeObjectException,ParamDataIsEmptyException,NumberFormatException {
 
         HttpServletRequest request = RequestContextHolder.getHttpServletRequest();
 
@@ -129,7 +131,7 @@ public class RequestMappingHandler {
         return BaseDataTypeChange.stringToBaseData(invokeRequestParam.getArgClass().getName(),data);
     }
 
-    private Object paramDataToRequestBody(InvokeRequestBody invokeRequestBody, HttpServletRequest request) throws IOException {
+    private Object paramDataToRequestBody(InvokeRequestBody invokeRequestBody, HttpServletRequest request) throws JsonHandlerException,IOException {
         StringBuilder sb = new StringBuilder();
 
         InputStreamReader inputStreamReader = new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8);
