@@ -44,7 +44,7 @@ public class RequestMappingHandler {
         this.urlAbsolutelyMap = urlAbsolutelyMap;
         this.urlFuzzyMap = urlFuzzyMap;
 
-        dataObjectSerialize = applicationContext.tryGetBean(DefaultDataObjectSerialize.class);
+        dataObjectSerialize = applicationContext.getBean(DataObjectSerialize.class);
         configReader = applicationContext.getBean(ConfigReader.class);
     }
 
