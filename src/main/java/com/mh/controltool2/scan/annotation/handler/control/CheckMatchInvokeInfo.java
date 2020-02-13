@@ -1,6 +1,6 @@
 package com.mh.controltool2.scan.annotation.handler.control;
 
-import com.mh.controltool2.exceptions.scan.MultipleAnnotationException;
+import com.mh.controltool2.LogOut;
 import com.mh.controltool2.method.type.InvokeDefaultValue;
 import com.mh.controltool2.method.type.InvokeObjectInfo;
 import com.mh.controltool2.method.type.InvokeUnmatchedObject;
@@ -15,6 +15,8 @@ import java.util.List;
 
 public class CheckMatchInvokeInfo {
 
+    private static final String TAG = "CheckMatchInvokeInfo";
+
     private static final List<AnnotationTypeHandler> ANNOTATION_TYPE_HANDLERS = new ArrayList<AnnotationTypeHandler>(){{
         add(new TypePathVariable());
         add(new TypeRequestBody());
@@ -22,7 +24,7 @@ public class CheckMatchInvokeInfo {
         add(new TypeRequestHeader());
     }};
 
-    public InvokeObjectInfo[] checkToInvokeObjectGroup(String url,Method method) throws MultipleAnnotationException {
+    public InvokeObjectInfo[] checkToInvokeObjectGroup(String url,Method method) {
         if (method.getParameterCount() <= 0) {
             return new InvokeObjectInfo[0];
         }
@@ -32,7 +34,7 @@ public class CheckMatchInvokeInfo {
         for (int i = 0;i < parameter.length;i++) {
             Annotation[] paramAnnotation = parameter[i].getAnnotations();
             if (paramAnnotation.length > 1) {
-                throw new MultipleAnnotationException();
+                LogOut.e(TAG,String.format("Method parameter has multiple annotation,will be use any one. -- %s",method.toString()));
             }
 
             if (paramAnnotation.length <= 0) {
@@ -40,13 +42,14 @@ public class CheckMatchInvokeInfo {
                 invokeObjectInfoGroup[i] = unknownAnnotationMatch(parameter[i]);
                 continue;
             } else {
-                // use framework handler
-                parameter[i].getType();
+                // use framework handler (Match any one annotation logic)
+//                parameter[i].getType();
                 for (AnnotationTypeHandler item : ANNOTATION_TYPE_HANDLERS) {
                     if (!parameter[i].isAnnotationPresent(item.getMatchAnnotation())) {
                         continue;
                     }
                     invokeObjectInfoGroup[i] = item.annotationType(url,method,parameter[i]);
+                    break;
                 }
 
             }

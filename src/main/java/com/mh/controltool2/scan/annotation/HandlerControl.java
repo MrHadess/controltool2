@@ -4,7 +4,6 @@ import com.mh.controltool2.LogOut;
 import com.mh.controltool2.annotation.RequestMapping;
 import com.mh.controltool2.annotation.RestController;
 import com.mh.controltool2.exceptions.RepeatURLMethodException;
-import com.mh.controltool2.exceptions.scan.MultipleAnnotationException;
 import com.mh.controltool2.method.MethodInvokeInfo;
 import com.mh.controltool2.method.URLInvokeTree;
 import com.mh.controltool2.method.type.InvokeObjectInfo;
@@ -99,11 +98,7 @@ public class HandlerControl implements PackageProcessHandler {
             methodInvokeInfo.setTargetMethod(method);
 
             InvokeObjectInfo[] invokeObjectInfoGroup = null;
-            try {
-                invokeObjectInfoGroup = checkMatchInvokeInfo.checkToInvokeObjectGroup(matchURl,method);
-            } catch (MultipleAnnotationException e) {
-                printErrLog(matchClass,method,"Method param has multiple annotation");
-            }
+            invokeObjectInfoGroup = checkMatchInvokeInfo.checkToInvokeObjectGroup(matchURl,method);
 
             methodInvokeInfo.setInvokeObjectInfoGroup(invokeObjectInfoGroup);
 
