@@ -6,8 +6,4 @@ public class InvokeDefaultValue extends InvokeObjectInfo {
         return TypeEnum.SupportDefaultValue;
     }
 
-    @Override
-    public Class<?> getArgClass() {
-        return null;
-    }
 }
