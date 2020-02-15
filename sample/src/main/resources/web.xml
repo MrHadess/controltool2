@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+    <servlet>
+        <servlet-name>TestControl</servlet-name>
+        <servlet-class>com.mh.controltool2.FrameworkServlet</servlet-class>
+        <!-- Must be has this init param.if you scan multiple package,you can use ';' separate package -->
+        <init-param>
+            <param-name>ScanPkg</param-name>
+            <param-value>com.mh.controltool2.sample</param-value>
+        </init-param>
+        <!-- (OptionalParam) If you has bean need load config value,then be use to -->
+        <!-- Support 'properties' file from read -->
+        <!-- Default read file value is 'controltool.properties' -->
+        <!-- Support absolute path or just file name mode.If use just file name will be load from running class path root read file -->
+        <init-param>
+            <param-name>BeanProperties</param-name>
+            <param-value>controltool.properties</param-value>
+        </init-param>
+        <!-- You can creating web container from load framework -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>TestControl</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+
+</web-app>
