@@ -3,18 +3,22 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>controltool2</artifactId>
-        <groupId>com.mh.controltool2</groupId>
+        <artifactId>controltool</artifactId>
+        <groupId>com.mh.controltool</groupId>
         <version>[1.0,)</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+    <!--<artifactId>sample</artifactId>-->
+    <!--<groupId>com.mh.controltool2</groupId>-->
+    <!--<version>1.0</version>-->
 
     <artifactId>sample</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>com.mh.controltool2</groupId>
-            <artifactId>controltool2</artifactId>
+            <groupId>com.mh.controltool</groupId>
+            <artifactId>core</artifactId>
             <version>[1.0,)</version>
         </dependency>
 
@@ -22,6 +26,14 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.28</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
         </dependency>
 
         <!--<dependency>-->
