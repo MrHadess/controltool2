@@ -1,6 +1,5 @@
 package com.mh.controltool2.scan.annotation;
 
-import com.mh.controltool2.LogOut;
 import com.mh.controltool2.annotation.RequestMapping;
 import com.mh.controltool2.annotation.RestController;
 import com.mh.controltool2.exceptions.RepeatURLMethodException;
@@ -10,6 +9,8 @@ import com.mh.controltool2.method.type.InvokeObjectInfo;
 import com.mh.controltool2.scan.PackageProcessHandler;
 import com.mh.controltool2.scan.annotation.handler.control.CheckMatchInvokeInfo;
 import com.mh.controltool2.scan.fuzzymatch.FuzzyURLMatchToInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ import java.util.regex.Pattern;
 
 public class HandlerControl implements PackageProcessHandler {
 
-    private static final String TAG = "HandlerControl";
+    private static Logger logger = LoggerFactory.getLogger("HandlerControl");
 
     private Pattern urlWarnPattern = Pattern.compile("(/+|.*?)(/{2,})(/+|.*?)");//检查是否存在多个"/"斜杠以作出提示（需要附加相关响应控制器的位置信息）
     private Pattern checkVarMatch = Pattern.compile(".+?[{].+?[}].*?");//简单检查是否存在"XX/{ZZZZZ}/XXXX/{ZZZZZZ}/XXXXX"格式的字符串(存在时则认为存在相关动态变量，将进行相关流程处理)
@@ -115,7 +116,7 @@ public class HandlerControl implements PackageProcessHandler {
                 printErrLog(matchClass,method,message);
             }
 
-            LogOut.i(TAG,String.format("%s.%s--Handler mapping to url:'%s'",matchClass.getName(),method.getName(),matchURl));
+            logger.info(String.format("%s.%s--Handler mapping to url:'%s'",matchClass.getName(),method.getName(),matchURl));
 
         }
 
@@ -149,7 +150,7 @@ public class HandlerControl implements PackageProcessHandler {
     }
 
     private void printErrLog(Class<?> tClass, Method method, String message) {
-        LogOut.e(TAG,String.format("%s.%s  %s",tClass.getName(),method.getName(),message));
+        logger.error(String.format("%s.%s  %s",tClass.getName(),method.getName(),message));
     }
 
     public HashMap<String, URLInvokeTree> getUrlAbsolutelyMap() {

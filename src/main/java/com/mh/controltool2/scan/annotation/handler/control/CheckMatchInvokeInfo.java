@@ -1,9 +1,10 @@
 package com.mh.controltool2.scan.annotation.handler.control;
 
-import com.mh.controltool2.LogOut;
 import com.mh.controltool2.method.type.InvokeDefaultValue;
 import com.mh.controltool2.method.type.InvokeObjectInfo;
 import com.mh.controltool2.method.type.InvokeUnmatchedObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,7 +16,7 @@ import java.util.List;
 
 public class CheckMatchInvokeInfo {
 
-    private static final String TAG = "CheckMatchInvokeInfo";
+    private static Logger logger = LoggerFactory.getLogger("CheckMatchInvokeInfo");
 
     private static final List<AnnotationTypeHandler> ANNOTATION_TYPE_HANDLERS = new ArrayList<AnnotationTypeHandler>(){{
         add(new TypePathVariable());
@@ -34,7 +35,7 @@ public class CheckMatchInvokeInfo {
         for (int i = 0;i < parameter.length;i++) {
             Annotation[] paramAnnotation = parameter[i].getAnnotations();
             if (paramAnnotation.length > 1) {
-                LogOut.e(TAG,String.format("Method parameter has multiple annotation,will be use any one. -- %s",method.toString()));
+                logger.error(String.format("Method parameter has multiple annotation,will be use any one. -- %s",method.toString()));
             }
 
             if (paramAnnotation.length <= 0) {

@@ -1,7 +1,8 @@
 package com.mh.controltool2.context;
 
-import com.mh.controltool2.LogOut;
 import com.mh.controltool2.serialize.BaseDataTypeChange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,7 +12,7 @@ import java.util.Properties;
 
 public class ConfigReaderToFramework implements ConfigReader {
 
-    private static final String TAG = "ConfigReaderToFramework";
+    private static Logger logger = LoggerFactory.getLogger(ConfigReaderToFramework.class);
 
     private Properties properties = new Properties();
 
@@ -20,7 +21,7 @@ public class ConfigReaderToFramework implements ConfigReader {
     * */
     public ConfigReaderToFramework(String propertiesFileName) {
         if (propertiesFileName == null) {
-            LogOut.e(TAG,"properties file value is null");
+            logger.warn("properties file value is null");
             return;
         }
         File tempFile = new File(propertiesFileName);
@@ -28,7 +29,7 @@ public class ConfigReaderToFramework implements ConfigReader {
             // load class path to file
             URL url = ConfigReaderToFramework.class.getClassLoader().getResource(propertiesFileName);
             if (url == null) {
-                LogOut.e(TAG,String.format("Unable file to read config file:'classpath:%s'",propertiesFileName));
+                logger.warn(String.format("Unable file to read config file:'classpath:%s'",propertiesFileName));
                 return;
             }
             tempFile = new File(url.getFile());
@@ -36,7 +37,7 @@ public class ConfigReaderToFramework implements ConfigReader {
 
         // check file exists
         if (!tempFile.exists()) {
-            LogOut.e(TAG,String.format("Unable file to read config file:'%s'",propertiesFileName));
+            logger.warn(String.format("Unable file to read config file:'%s'",propertiesFileName));
             return;
         }
 

@@ -1,8 +1,9 @@
 package com.mh.controltool2.scan.annotation;
 
-import com.mh.controltool2.LogOut;
 import com.mh.controltool2.annotation.Bean;
 import com.mh.controltool2.scan.PackageProcessHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Map;
 
 public class HandlerBean implements PackageProcessHandler {
 
-    private static final String TAG = "HandlerBean";
+    private static Logger logger = LoggerFactory.getLogger("HandlerBean");
 
     private Map<String,Class<?>> scanBeanMap = new HashMap<>();
 
@@ -22,7 +23,7 @@ public class HandlerBean implements PackageProcessHandler {
             if (beanAnnotation == null) continue;
 
             if (item.isInterface()) {
-                LogOut.i(TAG,String.format("Bean is interface -> %s",item.getName()));
+                logger.info(String.format("Bean is interface -> %s",item.getName()));
                 continue;
             }
 

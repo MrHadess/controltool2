@@ -1,8 +1,9 @@
 package com.mh.controltool2.config;
 
-import com.mh.controltool2.LogOut;
 import com.mh.controltool2.scan.fuzzymatch.FuzzyURLMatchToInfo;
 import com.mh.controltool2.servlet.HandlerInterceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +13,7 @@ import java.util.regex.Pattern;
 
 public class MappedInterceptor {
 
-    private static final String TAG = "MappedInterceptor";
+    private static Logger logger = LoggerFactory.getLogger(MappedInterceptor.class);
 
     private final HandlerInterceptor interceptor;
 
@@ -52,7 +53,7 @@ public class MappedInterceptor {
             if (url == null) continue;
             Pattern pattern = FuzzyURLMatchToInfo.urlCoverToInterceptorPattern(url);
             if (pattern == null) {
-                LogOut.i(TAG, String.format("URL is unsupported : %s", url));
+                logger.info(String.format("URL is unsupported : %s", url));
                 continue;
             }
             patternList.add(pattern);

@@ -1,14 +1,15 @@
 package com.mh.controltool2.serialize.json;
 
-import com.mh.controltool2.LogOut;
 import com.mh.controltool2.exceptions.serialize.JsonHandlerException;
 import com.mh.controltool2.exceptions.serialize.UnknownJsonLibException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 
 public class DefaultDataObjectSerialize implements DataObjectSerialize {
 
-    private static final String TAG = "DefaultDataObjectSerialize";
+    private static Logger logger = LoggerFactory.getLogger("DefaultDataObjectSerialize");
 
     private static final String[] CHECK_GSON_PACKAGE = new String[]{"com.google.gson.Gson"};
     private static final String[] CHECK_JACKSON_PACKAGE = new String[]{"com.fasterxml.jackson.databind.ObjectMapper","com.fasterxml.jackson.core.JsonFactory"};
@@ -20,19 +21,19 @@ public class DefaultDataObjectSerialize implements DataObjectSerialize {
 
         if (hasPackages(CHECK_GSON_PACKAGE)) {
             dataObjectSerialize = new GsonDataObjectSerialize();
-            LogOut.i(TAG,"Use Gson serialize");
+            logger.info("Use Gson serialize");
             return;
         }
 
         if (hasPackages(CHECK_JACKSON_PACKAGE)) {
             dataObjectSerialize = new JacksonDataObjectSerialize();
-            LogOut.i(TAG,"Use Jackson serialize");
+            logger.info("Use Jackson serialize");
             return;
         }
 
         if (hasPackages(CHECK_FASTJSON_PACKAGE)) {
             dataObjectSerialize = new FastjsonDataObjectSerialize();
-            LogOut.i(TAG,"Use Fastjson serialize");
+            logger.info("Use Fastjson serialize");
             return;
         }
 

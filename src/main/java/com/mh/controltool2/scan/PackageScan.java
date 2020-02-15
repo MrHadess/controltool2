@@ -1,6 +1,7 @@
 package com.mh.controltool2.scan;
 
-import com.mh.controltool2.LogOut;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -16,6 +17,7 @@ import java.util.jar.JarFile;
 
 public class PackageScan {
 
+    private static Logger logger = LoggerFactory.getLogger(PackageScan.class);
 
     /**
      * 通过包名获取包内所有类
@@ -74,7 +76,7 @@ public class PackageScan {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Read file exception",e);
         }
 
         return classes;
@@ -114,9 +116,11 @@ public class PackageScan {
                     // 添加到集合中去
                     classes.add(Class.forName(packageName + '.' + className));
                 } catch (ClassNotFoundException e) {
-                    LogOut.e("Please try to move the jar package to \"WEB-INF/lib\"" +
-                            "\nMaybe  \"ControlTool\" jar package save to tomcat root lib,lead to \"ClassNotFoundException\" . ");
-                    e.printStackTrace();
+                    logger.error(
+                            "Please try to move the jar package to \"WEB-INF/lib\"" +
+                            "\nMaybe  \"ControlTool\" jar package save to tomcat root lib,lead to \"ClassNotFoundException\" . ",
+                            e
+                    );
                 }
             }
         }
@@ -160,7 +164,7 @@ public class PackageScan {
                             // 添加到classes
                             classes.add(Class.forName(packageName + '.' + className));
                         } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
+                            logger.info("Unmatched class name",e);
                         }
                     }
                 }

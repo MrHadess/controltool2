@@ -3,7 +3,6 @@ package com.mh.controltool2.handler;
 
 import com.mh.controltool2.ApplicationContext;
 import com.mh.controltool2.Config;
-import com.mh.controltool2.LogOut;
 import com.mh.controltool2.exceptions.invoke.BeanInstantiationException;
 import com.mh.controltool2.exceptions.invoke.HandlerThrowException;
 import com.mh.controltool2.exceptions.invoke.ParamDataIsEmptyException;
@@ -12,7 +11,8 @@ import com.mh.controltool2.exceptions.serialize.JsonHandlerException;
 import com.mh.controltool2.handler.message.ExceptionHandler;
 import com.mh.controltool2.handler.message.HttpMessageRewrite;
 import com.mh.controltool2.handler.pojo.RequestMatchInfo;
-import com.mh.controltool2.serialize.json.DataObjectSerialize;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,7 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 * */
 public class DispatcherServlet {
 
-    private static final String TAG = "DispatcherServlet";
+    private static Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
     private ApplicationContext applicationContext;
     private HttpMessageRewrite httpMessageRewrite;
@@ -85,7 +85,7 @@ public class DispatcherServlet {
                 return null;// cut next handler
             }
         } catch (HandlerThrowException e) {
-            e.getCause().printStackTrace();
+            logger.error("Interceptor handler fail",e.getCause());
             return exceptionHandler.resolveException(request,response,e);
         }
 
@@ -93,18 +93,17 @@ public class DispatcherServlet {
         try {
             reqReturnObject = requestMappingHandler.request(requestMatchInfo);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            logger.error("Invoke object access exception",e);
 //            rewriteExceptionToClient(response,"Method access fail",e);
             return exceptionHandler.resolveException(request,response,e);
         } catch (JsonHandlerException e) {
             return exceptionHandler.resolveException(request, response, new HandlerThrowException("Json deserialize from request fail", e));
         } catch (UnsupportedSerializeObjectException | ParamDataIsEmptyException | NumberFormatException e) {
-            LogOut.e(TAG,"Please change logic code");
-            e.printStackTrace();
+            logger.error("Please change logic code",e);
             return exceptionHandler.resolveException(request, response, new HandlerThrowException("Request handler fail", e));
         } catch (InvocationTargetException e) {
             // use to 'handler interceptor'
-            e.getCause().printStackTrace();
+            logger.error("Invoke throw exception",e.getCause());
             // use interceptor handler exception
             try {
                 requestInterceptorHandler.requestHandlerAfter(requestMatchInfo.getMethodInvokeInfo().getTargetMethod(), (Exception) e.getCause());
@@ -113,7 +112,7 @@ public class DispatcherServlet {
             }
             return exceptionHandler.resolveException(request,response,new HandlerThrowException("Control throw exception",e.getCause()));
         } catch (Exception e) { // Unhandled exception use that last catch
-            e.printStackTrace();
+            logger.error("Unhandled exception exception",e);
             return exceptionHandler.resolveException(request, response, e);
         }
 
@@ -121,7 +120,7 @@ public class DispatcherServlet {
             requestInterceptorHandler.requestHandlerAfter(requestMatchInfo.getMethodInvokeInfo().getTargetMethod(),null);
         } catch (HandlerThrowException e) {
             // use to 'handler interceptor'
-            e.getCause().printStackTrace();
+            logger.error("Unhandled exception exception",e.getCause());
             return exceptionHandler.resolveException(request,response,new HandlerThrowException("Control throw exception",e));
         }
 

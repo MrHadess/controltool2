@@ -4,6 +4,8 @@ import com.mh.controltool2.context.AssemblyBeanLoader;
 import com.mh.controltool2.context.BeanUtil;
 import com.mh.controltool2.context.FullApplicationContext;
 import com.mh.controltool2.handler.DispatcherServlet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -13,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class FrameworkServlet extends HttpServlet {
+
+    private static Logger logger = LoggerFactory.getLogger("FrameworkServlet");
 
     private Config config;
     private ApplicationContext applicationContext = new FullApplicationContext();
@@ -25,9 +29,9 @@ public class FrameworkServlet extends HttpServlet {
 
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
-        System.out.println("Control Tool version:2.0.0");
+        logger.info("Control Tool version:2.0.0");
 //        System.out.println(logo);
-        LogOut.i("FrameworkServlet initiation");
+        logger.info("FrameworkServlet initiation");
 
         config = Config.create(servletConfig);
         // load default assembly
