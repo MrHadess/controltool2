@@ -7,7 +7,7 @@
     <groupId>com.mh.controltool</groupId>
     <artifactId>controltool-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.5</version>
+    <version>1.1.6</version>
     <modules>
         <module>controltool-sample</module>
         <module>controltool</module>
