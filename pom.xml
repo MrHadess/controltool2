@@ -19,7 +19,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <revision>1.1.6</revision>
+        <revision>2.1.6</revision>
     </properties>
 
     <dependencyManagement>
