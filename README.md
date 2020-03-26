@@ -67,6 +67,7 @@ Control支持多类型数据数据注入，以实现灵活的网络请求处理
 @Bean
 @Autowired
 @Configuration
+@Value
 ```
  
 ##### 对象容器初始化流程
@@ -76,5 +77,56 @@ Control支持多类型数据数据注入，以实现灵活的网络请求处理
 4. Create dispatcher servlet
 
 
-###### 由于架构设计及实现差异，部分注解功能无法完全按照Spring模式进行使用或者运行 
+###### 由于架构设计及实现差异，部分注解功能无法完全按照Spring模式进行使用或者运行
+ 
+##### 注解说明
+###### @Bean
+作用域-类，构造函数参数，方法参数
+* 类-将会加载相关实例到容器，供参数注入。
+```
+@Bean() // 支持实例
+@Bean("class name") // 可赋值Bean name，如接口类供参数注入时，使用接口类调用该实现类
+```
+* 构造函数参数
+* 方法参数
+```
+@Bean() // 自动根据当前注入类注入相关实例参数
+@Bean("class name") // 指定相关实现类的且拥有馆匹配的bean name
+```
+
+###### @Autowired
+作用域-构造函数参数，方法参数
+* 构造函数参数 - 含有该注解的构造函数，将会优先使用相关的构造函数，实例化类。当遇到无法注入的参数，将会尝试下一个含有该注解的构造函数。如果都Fail，则会检查是否存在口构造函数，如无则会中断实例化
+* 方法参数注入 - 根据当前实例类作为bean name注入参数
+```
+void access(@Autowrid() ClassName impl) {
+   // can use it impl 
+}
+```
+
+###### @Value
+作用域-构造函数参数，方法参数
+* 构造函数参数注入，方法参数注入 - 将会读取Properties文件，注释中的value将作为key对应的参数，进行参数注入。注入参数支持基本数据类型及基本数据类型的包装类
+```
+@Value("key name")
+```
+
+###### @RestController
+作用域-类
+* 类 - 包含该注解时，该类将作为控制器
+
+###### @RequestMapping
+作用域-类，方法
+* 类 - 将作为该控制器下所有访问的URL前缀，Request method 参数将会被忽略
+* 方法 - 支持缺省Request method，以及指定Request method
+```
+@RequestMapping("/Hello")
+// 默认 RequestMethod 为full，即所有类型的Request method都将转发至该方法
+@RequestMapping(value = "/Hello" ,method = RequestMethod.GET)
+// RequestMethod 支持GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE
+```
+
+
+
+
  
