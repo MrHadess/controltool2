@@ -80,6 +80,7 @@ Control支持多类型数据数据注入，以实现灵活的网络请求处理
 ###### 由于架构设计及实现差异，部分注解功能无法完全按照Spring模式进行使用或者运行
  
 ##### 注解说明
+
 ###### @Bean
 作用域-类，构造函数参数，方法参数
 * 类-将会加载相关实例到容器，供参数注入。
@@ -126,6 +127,42 @@ void access(@Autowrid() ClassName impl) {
 // RequestMethod 支持GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE
 ```
 
+###### @RequestBody
+作用域-方法参数
+* 方法 - 加载Request数据流，并尝试使用Json格式反序列化至当前参数的对象
+
+###### @RequestHeader
+作用域-方法参数
+* 方法 - 根据注解参数作为key，获取Request当中header参数进行注入，注入参数支持基本数据类型及基本数据类型的包装类
+```
+void functionName(@RequestHeader("content-type") String contentType) {}
+```
+
+###### @RequestParam
+作用域-方法参数
+* 方法 - 根据注解参数作为key，获取Request当中parameter参数进行注入，注入参数支持基本数据类型及基本数据类型的包装类
+```
+void functionName(@RequestParam("id") Integer id) {}
+```
+
+###### @PathVariable
+作用域-方法参数
+* 方法 - 根据注解参数作为key，获取URL当中参数进行注入，注入参数支持基本数据类型及基本数据类型的包装类。与'@RequestMapping'组合使用
+```
+@RequestMapping("/image/{id}")
+void functionName(@PathVariable("id") String id) {}
+```
+
+###### @Configuration
+作用域-类
+* 类 - 配置controltool参数，需实现接口'com.mh.controltool2.config.annotation.Configurer2'。如有多个该注解，则为先到先得原则且只匹配一次，仅对注解的其中一个实现生效
+
+  
+##### URL匹配规则
+内部并无Spring对URL进行评分机制，内部使用匹配模式对Request的处理实现
+* 当声明RequestMapping时，如使用缺省值或指定为full，所有请求的类型都可转发至相关控制器
+* 当存在多组相同URL，其RequestMethod声明除了一般类型，还有full类型时，内部则会优先匹配指定声明类型的URL，如不匹配则再转至full类型进行请求
+* 当存在多组相同URL相同RequestMethod时，则只匹配第一个URL，如后面出现相同URL且重叠RequestMethod时，则不会纳入URL匹配队列中
 
 
 
