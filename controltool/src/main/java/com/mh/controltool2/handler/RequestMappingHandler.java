@@ -8,8 +8,8 @@ import com.mh.controltool2.exceptions.invoke.UnsupportedSerializeObjectException
 import com.mh.controltool2.exceptions.serialize.JsonHandlerException;
 import com.mh.controltool2.handler.pojo.RequestFuzzyURLMatchInfo;
 import com.mh.controltool2.handler.pojo.RequestMatchInfo;
+import com.mh.controltool2.method.MatchInvokeObject;
 import com.mh.controltool2.method.MethodInvokeInfo;
-import com.mh.controltool2.method.URLInvokeTree;
 import com.mh.controltool2.method.type.*;
 import com.mh.controltool2.serialize.BaseDataTypeChange;
 import com.mh.controltool2.serialize.json.DataObjectSerialize;
@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 public class RequestMappingHandler {
 
     private ApplicationContext applicationContext;
-    private HashMap<String,URLInvokeTree> urlAbsolutelyMap;
+    private HashMap<String, MatchInvokeObject> urlAbsolutelyMap;
     private List<RequestFuzzyURLMatchInfo> requestFuzzyURLMatchInfoList;
 
     private DataObjectSerialize dataObjectSerialize;
@@ -39,8 +39,8 @@ public class RequestMappingHandler {
 
     public RequestMappingHandler(
             ApplicationContext applicationContext,
-            HashMap<String, URLInvokeTree> urlAbsolutelyMap,
-            HashMap<Pattern, URLInvokeTree> urlFuzzyMap
+            HashMap<String, MatchInvokeObject> urlAbsolutelyMap,
+            HashMap<Pattern, MatchInvokeObject> urlFuzzyMap
     ) throws BeanInstantiationException {
         this.applicationContext = applicationContext;
         this.urlAbsolutelyMap = urlAbsolutelyMap;
@@ -50,12 +50,12 @@ public class RequestMappingHandler {
         configReader = applicationContext.getBean(ConfigReader.class);
     }
 
-    private static List<RequestFuzzyURLMatchInfo> urlFuzzyMapConvertToList(HashMap<Pattern, URLInvokeTree> urlFuzzyMap) {
+    private static List<RequestFuzzyURLMatchInfo> urlFuzzyMapConvertToList(HashMap<Pattern, MatchInvokeObject> urlFuzzyMap) {
         List<RequestFuzzyURLMatchInfo> requestFuzzyURLMatchInfoList = new ArrayList<>(urlFuzzyMap.size());
-        for (Map.Entry<Pattern, URLInvokeTree> item:urlFuzzyMap.entrySet()) {
+        for (Map.Entry<Pattern, MatchInvokeObject> item:urlFuzzyMap.entrySet()) {
             RequestFuzzyURLMatchInfo fuzzyURLMatchInfo = new RequestFuzzyURLMatchInfo();
             fuzzyURLMatchInfo.setPattern(item.getKey());
-            fuzzyURLMatchInfo.setUrlInvokeTree(item.getValue());
+            fuzzyURLMatchInfo.setMatchInvokeObject(item.getValue());
             requestFuzzyURLMatchInfoList.add(fuzzyURLMatchInfo);
         }
         return requestFuzzyURLMatchInfoList;
@@ -67,7 +67,7 @@ public class RequestMappingHandler {
         String reqPathInfo = request.getPathInfo();
         String reqMethod = request.getMethod();
 
-        URLInvokeTree urlInvokeTree = null;
+        MatchInvokeObject urlInvokeTree = null;
         urlInvokeTree = urlAbsolutelyMap.get(reqPathInfo);
         if (urlInvokeTree != null) {
             return RequestMatchInfo.CreateRequestMatchAbsolutely(
@@ -83,7 +83,7 @@ public class RequestMappingHandler {
             return RequestMatchInfo.CreateRequestMatchFuzzy(
                     reqPathInfo,
                     matcher,
-                    requestFuzzyURLMatchInfoList.get(i).getUrlInvokeTree().getMatchInvokeObject(reqMethod)
+                    requestFuzzyURLMatchInfoList.get(i).getMatchInvokeObject().getMatchInvokeObject(reqMethod)
             );
         }
 

@@ -8,7 +8,7 @@ import java.util.HashMap;
 public class URLInvokeTree implements MatchInvokeObject {
 
     private int matchMethodNum = 0;
-    private MatchInvokeObject matchInvokeObject;
+    private RequestMethodMatchInvokeObject matchInvokeObject;
     private HashMap<RequestMethod,MethodInvokeInfo> requestMethodInvokeInfoMap = new HashMap<RequestMethod, MethodInvokeInfo>();
 
     @Override
@@ -16,6 +16,7 @@ public class URLInvokeTree implements MatchInvokeObject {
         return matchInvokeObject.getMatchInvokeObject(requestMethod);
     }
 
+    @Override
     public void addInvokeInfo(MethodInvokeInfo methodInvokeInfo, final RequestMethod requestMethod) throws RepeatURLMethodException {
         if (requestMethodInvokeInfoMap.containsKey(requestMethod)) {
             MethodInvokeInfo oldMethodInvokeInfo = requestMethodInvokeInfoMap.get(requestMethod);
@@ -31,7 +32,7 @@ public class URLInvokeTree implements MatchInvokeObject {
         requestMethodInvokeInfoMap.put(requestMethod,methodInvokeInfo);
 
         if (matchMethodNum == 1) {
-            matchInvokeObject = new MatchInvokeObject() {
+            matchInvokeObject = new RequestMethodMatchInvokeObject() {
                 @Override
                 public MethodInvokeInfo getMatchInvokeObject(String trueRequestMethod) {
                     if (requestMethod == RequestMethod.Full) return methodInvokeInfo;
@@ -71,7 +72,7 @@ public class URLInvokeTree implements MatchInvokeObject {
         return matchMethodNum;
     }
 
-    private MatchInvokeObject multipleInvokeObject = new MatchInvokeObject() {
+    private RequestMethodMatchInvokeObject multipleInvokeObject = new RequestMethodMatchInvokeObject() {
         @Override
         public MethodInvokeInfo getMatchInvokeObject(String requestMethod) {
             MethodInvokeInfo matchInvokeMethod = null;

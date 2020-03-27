@@ -3,8 +3,10 @@ package com.mh.controltool2.scan.annotation;
 import com.mh.controltool2.annotation.RequestMapping;
 import com.mh.controltool2.annotation.RestController;
 import com.mh.controltool2.exceptions.RepeatURLMethodException;
+import com.mh.controltool2.method.MatchInvokeObject;
 import com.mh.controltool2.method.MethodInvokeInfo;
 import com.mh.controltool2.method.URLInvokeTree;
+import com.mh.controltool2.method.URLInvokeTreeV2;
 import com.mh.controltool2.method.type.InvokeObjectInfo;
 import com.mh.controltool2.scan.PackageProcessHandler;
 import com.mh.controltool2.scan.annotation.handler.control.CheckMatchInvokeInfo;
@@ -29,8 +31,8 @@ public class HandlerControl implements PackageProcessHandler {
 
     private CheckMatchInvokeInfo checkMatchInvokeInfo = new CheckMatchInvokeInfo();
 
-    private HashMap<String,URLInvokeTree> urlAbsolutelyMap;
-    private HashMap<Pattern,URLInvokeTree> urlFuzzyMap;
+    private HashMap<String,MatchInvokeObject> urlAbsolutelyMap;
+    private HashMap<Pattern,MatchInvokeObject> urlFuzzyMap;
 
     @Override
     public void loadFullPackageData(List<Class<?>> classList) {
@@ -125,11 +127,11 @@ public class HandlerControl implements PackageProcessHandler {
     private void updateFuzzyMatch(String matchURl, MethodInvokeInfo methodInvokeInfo, RequestMapping requestMapping) throws RepeatURLMethodException {
 
         Pattern urlPattern = FuzzyURLMatchToInfo.urlCoverToPattern(matchURl);
-        URLInvokeTree urlInvokeTree = urlFuzzyMap.get(urlPattern);
+        MatchInvokeObject urlInvokeTree = urlFuzzyMap.get(urlPattern);
         if (urlInvokeTree != null) {
             urlInvokeTree.addInvokeInfo(methodInvokeInfo,requestMapping.method());
         } else {
-            urlInvokeTree = new URLInvokeTree();
+            urlInvokeTree = new URLInvokeTreeV2();
             urlInvokeTree.addInvokeInfo(methodInvokeInfo,requestMapping.method());
             urlFuzzyMap.put(urlPattern,urlInvokeTree);
         }
@@ -138,11 +140,11 @@ public class HandlerControl implements PackageProcessHandler {
 
     private void updateAbsolutelyMatch(String matchURl, MethodInvokeInfo methodInvokeInfo, RequestMapping requestMapping) throws RepeatURLMethodException {
 
-        URLInvokeTree urlInvokeTree = urlAbsolutelyMap.get(matchURl);
+        MatchInvokeObject urlInvokeTree = urlAbsolutelyMap.get(matchURl);
         if (urlInvokeTree != null) {
             urlInvokeTree.addInvokeInfo(methodInvokeInfo,requestMapping.method());
         } else {
-            urlInvokeTree = new URLInvokeTree();
+            urlInvokeTree = new URLInvokeTreeV2();
             urlInvokeTree.addInvokeInfo(methodInvokeInfo,requestMapping.method());
             urlAbsolutelyMap.put(matchURl,urlInvokeTree);
         }
@@ -153,11 +155,11 @@ public class HandlerControl implements PackageProcessHandler {
         logger.error(String.format("%s.%s  %s",tClass.getName(),method.getName(),message));
     }
 
-    public HashMap<String, URLInvokeTree> getUrlAbsolutelyMap() {
+    public HashMap<String, MatchInvokeObject> getUrlAbsolutelyMap() {
         return urlAbsolutelyMap;
     }
 
-    public HashMap<Pattern, URLInvokeTree> getUrlFuzzyMap() {
+    public HashMap<Pattern, MatchInvokeObject> getUrlFuzzyMap() {
         return urlFuzzyMap;
     }
 }

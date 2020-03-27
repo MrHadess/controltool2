@@ -1,13 +1,13 @@
 package com.mh.controltool2.handler.pojo;
 
-import com.mh.controltool2.method.URLInvokeTree;
+import com.mh.controltool2.method.MatchInvokeObject;
 
 import java.util.regex.Pattern;
 
 public class RequestFuzzyURLMatchInfo {
 
     private Pattern pattern;
-    private URLInvokeTree urlInvokeTree;
+    private MatchInvokeObject matchInvokeObject;
 
     public Pattern getPattern() {
         return pattern;
@@ -17,19 +17,19 @@ public class RequestFuzzyURLMatchInfo {
         this.pattern = pattern;
     }
 
-    public URLInvokeTree getUrlInvokeTree() {
-        return urlInvokeTree;
+    public MatchInvokeObject getMatchInvokeObject() {
+        return matchInvokeObject;
     }
 
-    public void setUrlInvokeTree(URLInvokeTree urlInvokeTree) {
-        this.urlInvokeTree = urlInvokeTree;
+    public void setMatchInvokeObject(MatchInvokeObject matchInvokeObject) {
+        this.matchInvokeObject = matchInvokeObject;
     }
 
     @Override
     public String toString() {
         return "FuzzyURLMatchInfo{" +
                 "pattern=" + pattern +
-                ", urlInvokeTree=" + urlInvokeTree +
+                ", matchInvokeObject=" + matchInvokeObject +
                 '}';
     }
 }
