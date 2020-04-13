@@ -12,6 +12,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -121,6 +122,8 @@ public class PackageScan {
                             "\nMaybe  \"ControlTool\" jar package save to tomcat root lib,lead to \"ClassNotFoundException\" . ",
                             e
                     );
+                } catch (NoClassDefFoundError e) {
+                    handlerNoClassDefFoundError(packageName + '.' + className,e);
                 }
             }
         }
@@ -165,6 +168,8 @@ public class PackageScan {
                             classes.add(Class.forName(packageName + '.' + className));
                         } catch (ClassNotFoundException e) {
                             logger.info("Unmatched class name",e);
+                        } catch (NoClassDefFoundError e) {
+                            handlerNoClassDefFoundError(packageName + '.' + className,e);
                         }
                     }
                 }
@@ -173,6 +178,19 @@ public class PackageScan {
         return classes;
     }
 
+    private static void handlerNoClassDefFoundError(String matchPackageName,NoClassDefFoundError e) {
+        Throwable throwableCause = e.getCause();
+        // If unknown cause,need throw error
+        if (throwableCause == null) throw e;
+
+        String losePackageName = throwableCause.getMessage();
+        if (Objects.equals(matchPackageName,losePackageName)) {
+            throw e;
+        } else {
+            // print can not load match package name
+            logger.error(String.format("Load class fail '%s' need class package '%s',this class will continue",matchPackageName,losePackageName));
+        }
+    }
 
 
 }
