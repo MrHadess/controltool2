@@ -29,7 +29,7 @@ public class FrameworkServlet extends HttpServlet {
 
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
-        logger.info("Control Tool version:2.1.9");
+        logger.info("Control Tool version:2.1.10");
 //        System.out.println(logo);
         logger.info("FrameworkServlet initiation");
 

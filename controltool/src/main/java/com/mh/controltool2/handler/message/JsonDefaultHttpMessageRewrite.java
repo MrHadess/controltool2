@@ -10,7 +10,7 @@ import java.io.PrintWriter;
 
 public class JsonDefaultHttpMessageRewrite implements HttpMessageRewrite {
 
-    private static final String DEFAULT_CONTENT_TYPE = "application/json;utf-8";
+    private static final String DEFAULT_CONTENT_TYPE = "application/json;charset=utf-8";
     private final String contentType;
     private DataObjectSerialize dataObjectSerialize;
 
