@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public class FuzzyURLMatchToInfo {
 
     private static Pattern checkItemMatch = Pattern.compile("\\{.+?}");
-    private static final String MatchCode = "([^\\/].+?)";
+    private static final String MatchCode = "(.[^/]+?)";
 
     public static Pattern urlCoverToPattern(String url) {
 
