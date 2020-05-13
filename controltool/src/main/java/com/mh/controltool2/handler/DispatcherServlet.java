@@ -105,11 +105,16 @@ public class DispatcherServlet {
             // use to 'handler interceptor'
             logger.error("Invoke throw exception",e.getCause());
             // use interceptor handler exception
-            try {
-                requestInterceptorHandler.requestHandlerAfter(requestMatchInfo.getMethodInvokeInfo().getTargetMethod(), (Exception) e.getCause());
-            } catch (HandlerThrowException requestInterceptorHandlerEx) {
-                e.getCause().addSuppressed(requestInterceptorHandlerEx.getCause());
+            if (e.getCause() instanceof Exception) {
+                try {
+                    requestInterceptorHandler.requestHandlerAfter(requestMatchInfo.getMethodInvokeInfo().getTargetMethod(), (Exception) e.getCause());
+                } catch (HandlerThrowException requestInterceptorHandlerEx) {
+                    e.getCause().addSuppressed(requestInterceptorHandlerEx.getCause());
+                }
+            } else {
+                logger.error("Can't handler exception",e.getCause());
             }
+
             return exceptionHandler.resolveException(request,response,new HandlerThrowException("Control throw exception",e.getCause()));
         } catch (Exception e) { // Unhandled exception use that last catch
             logger.error("Unhandled exception exception",e);
