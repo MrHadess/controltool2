@@ -1,6 +1,6 @@
 package com.mh.controltool2.config;
 
-import com.mh.controltool2.config.annotation.Configurer2;
+import com.mh.controltool2.config.annotation.Configurer;
 import com.mh.controltool2.handler.message.DefaultExceptionHandler;
 import com.mh.controltool2.handler.message.ExceptionHandler;
 import com.mh.controltool2.handler.message.HttpMessageRewrite;
@@ -22,7 +22,7 @@ public class LoadConfigurer {
     protected HttpMessageRewrite httpMessageRewrite = new JsonDefaultHttpMessageRewrite(dataObjectSerialize);
     protected ExceptionHandler exceptionHandler = new DefaultExceptionHandler();
 
-    public void load(Configurer2 configurer) {
+    public void load(Configurer configurer) {
         // load interceptor
         InterceptorRegistry interceptorRegistry = new InterceptorRegistry();
         configurer.addInterceptors(interceptorRegistry);

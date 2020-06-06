@@ -29,8 +29,8 @@ public class FrameworkServlet extends HttpServlet {
 
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
-        logger.info("Control Tool version:2.1.13");
-//        System.out.println(logo);
+        logger.info(LOGO);
+        logger.info("Control Tool version:2.1.2");
         logger.info("FrameworkServlet initiation");
 
         config = Config.create(servletConfig);
@@ -51,7 +51,8 @@ public class FrameworkServlet extends HttpServlet {
 
     }
 
-    private static final String logo =
+    private static final String LOGO =
+                            "\n" +
                             "   _____            _             _ _______          _ \n" +
                             "  / ____|          | |           | |__   __|        | |\n" +
                             " | |     ___  _ __ | |_ _ __ ___ | |  | | ___   ___ | |\n" +

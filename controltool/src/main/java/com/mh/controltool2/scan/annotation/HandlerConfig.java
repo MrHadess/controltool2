@@ -2,7 +2,7 @@ package com.mh.controltool2.scan.annotation;
 
 import com.mh.controltool2.annotation.Configuration;
 import com.mh.controltool2.config.LoadConfigurer;
-import com.mh.controltool2.config.annotation.Configurer2;
+import com.mh.controltool2.config.annotation.Configurer;
 import com.mh.controltool2.scan.PackageProcessHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +27,8 @@ public class HandlerConfig extends LoadConfigurer implements PackageProcessHandl
             if (annotationConfiguration == null) continue;
 
             // Create config Configurer
-            if (!Configurer2.class.isAssignableFrom(item)) {
-                logger.warn("Class unmatched 'Configurer2' => " + item.getName());
+            if (!Configurer.class.isAssignableFrom(item)) {
+                logger.warn("Class unmatched 'Configurer' => " + item.getName());
                 continue;
             }
 
@@ -46,7 +46,7 @@ public class HandlerConfig extends LoadConfigurer implements PackageProcessHandl
             logger.info(String.format("Use config:%s",item.getName()));
 
             try {
-                Configurer2 configurer = (Configurer2) item.newInstance();
+                Configurer configurer = (Configurer) item.newInstance();
                 load(configurer);
                 return;
             } catch (InstantiationException e) {

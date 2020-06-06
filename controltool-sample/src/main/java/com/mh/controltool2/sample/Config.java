@@ -2,22 +2,22 @@ package com.mh.controltool2.sample;
 
 import com.mh.controltool2.annotation.Configuration;
 import com.mh.controltool2.config.InterceptorRegistry;
-import com.mh.controltool2.config.annotation.Configurer2;
+import com.mh.controltool2.config.annotation.Configurer;
 import com.mh.controltool2.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Use configurer,must be impl 'Configurer2' and annotation 'Configuration'
- * @see Configurer2
+ * Use configurer,must be impl 'Configurer' and annotation 'Configuration'
+ * @see Configurer
  * @see Configuration
  *
  * Then focuse: Once instance servlet,just use any one use annotation 'Configuration'
  *
  * */
 @Configuration
-public class Config implements Configurer2 {
+public class Config implements Configurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

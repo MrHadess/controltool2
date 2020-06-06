@@ -7,13 +7,13 @@ import com.mh.controltool2.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 
 public class RequestInterceptorHandler {
 
     private final MappedInterceptor[] mappedInterceptorArray;
-    private ThreadLocal<Stack<HandlerInterceptor>> handlerInterceptorStackThreadLocal = new ThreadLocal<>();
+    private ThreadLocal<LinkedList<HandlerInterceptor>> handlerInterceptorLinkListThreadLocal = new ThreadLocal<>();
 
     public RequestInterceptorHandler(List<MappedInterceptor> mappedInterceptors) {
         this.mappedInterceptorArray = mappedInterceptors.toArray(new MappedInterceptor[0]);
@@ -24,7 +24,7 @@ public class RequestInterceptorHandler {
         String reqPathInfo = request.getPathInfo();
 
         // interceptor stack
-        Stack<HandlerInterceptor> handlerInterceptorStack = new Stack<>();
+        LinkedList<HandlerInterceptor> handlerInterceptorLinkedList = new LinkedList<>();
 
         boolean handlerAccept;
         for (MappedInterceptor item:mappedInterceptorArray) {
@@ -43,10 +43,10 @@ public class RequestInterceptorHandler {
                 throw new HandlerThrowException("Interceptor handler throw exception",e);
             }
 
-            handlerInterceptorStack.push(handlerInterceptor);
+            handlerInterceptorLinkedList.add(handlerInterceptor);
         }
 
-        handlerInterceptorStackThreadLocal.set(handlerInterceptorStack);
+        handlerInterceptorLinkListThreadLocal.set(handlerInterceptorLinkedList);
         return true;
     }
 
@@ -54,10 +54,9 @@ public class RequestInterceptorHandler {
         HttpServletRequest request = RequestContextHolder.getHttpServletRequest();
         HttpServletResponse response = RequestContextHolder.getHttpServletResponse();
         // get interceptor object stack
-        Stack<HandlerInterceptor> handlerInterceptorStack = handlerInterceptorStackThreadLocal.get();
-        while (!handlerInterceptorStack.empty()) {
-            HandlerInterceptor handlerInterceptor = handlerInterceptorStack.pop();
-
+        LinkedList<HandlerInterceptor> handlerInterceptorLinkedList = handlerInterceptorLinkListThreadLocal.get();
+        HandlerInterceptor handlerInterceptor;
+        while ((handlerInterceptor = handlerInterceptorLinkedList.pollLast()) != null) {
             try {
                 handlerInterceptor.afterCompletion(
                         request,
@@ -72,7 +71,7 @@ public class RequestInterceptorHandler {
     }
 
     public void cleanInterceptorStack() {
-        handlerInterceptorStackThreadLocal.remove();
+        handlerInterceptorLinkListThreadLocal.remove();
     }
 
 }

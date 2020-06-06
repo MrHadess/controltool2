@@ -155,7 +155,7 @@ void functionName(@PathVariable("id") String id) {}
 
 ###### @Configuration
 作用域-类
-* 类 - 配置controltool参数，需实现接口'com.mh.controltool2.config.annotation.Configurer2'。如有多个该注解，则为先到先得原则且只匹配一次，仅对注解的其中一个实现生效
+* 类 - 配置controltool参数，需实现接口'com.mh.controltool2.config.annotation.Configurer'。如有多个该注解，则为先到先得原则且只匹配一次，仅对注解的其中一个实现生效
 
   
 ##### URL匹配规则
